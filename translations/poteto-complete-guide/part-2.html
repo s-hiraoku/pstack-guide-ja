@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23246653'/%3E%3Ctext x='18' y='45' fill='white' font-family='sans-serif' font-size='43'%3Ep%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Lauren Tan（@poteto）The Complete Guide to pstack Pt.2 の非公式日本語訳。調査・計画・プロトタイプ・設計の進め方。">
+<title>pstack完全ガイド 第2部</title>
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<a class="skip-link" href="#article">本文へ移動</a>
+<div class="masthead"><a href="../../README.md">ENGINEERING NOTES / PSTACK</a><span>UNOFFICIAL JA TRANSLATION</span></div>
+<div class="layout">
+<aside class="desktop-toc"><p class="nav-title">CONTENTS / 目次</p><nav aria-label="章の目次"><ol><li><a href="#自分より賢い相手を監督する技術">自分より賢い相手を監督する技術</a></li><li><a href="#エージェント自身の言葉で">エージェント自身の言葉で</a></li><li><a href="#メンタルモデルを組み立てる">メンタルモデルを組み立てる</a></li><li><a href="#履歴から学ぶ">履歴から学ぶ</a></li><li><a href="#逆算して考える">逆算して考える</a></li><li><a href="#百回測って-一度で切る">百回測って、一度で切る</a></li><li><a href="#より大きな変更を設計する">より大きな変更を設計する</a></li><li><a href="#それでも計画ドキュメントが欲しい">それでも計画ドキュメントが欲しい</a></li><li><a href="#実際のワークフロー">実際のワークフロー</a></li><li><a href="#計画の技術">計画の技術</a></li></ol></nav></aside>
+<main class="main-column" id="top">
+<header>
+<p class="eyebrow">完全ガイド 非公式日本語訳</p>
+<h1>pstack完全ガイド 第2部</h1>
+<p class="subtitle">The art of supervising someone smarter than you</p>
+<div class="meta"><span>取得 2026-09-13</span><span>原文 2026-09-09</span><span>Lauren Tan (@poteto)</span><span>非公式訳</span></div>
+<div class="downloads"><a href="https://x.com/poteto/status/2097732320606507506">X の原文</a><a href="part-2.md">Markdown</a><a href="../../pstack-guide-ja.html">実践入門（別資料）</a></div>
+</header>
+<details class="mobile-toc"><summary>目次を開く</summary><nav aria-label="モバイル用の章の目次"><ol><li><a href="#自分より賢い相手を監督する技術">自分より賢い相手を監督する技術</a></li><li><a href="#エージェント自身の言葉で">エージェント自身の言葉で</a></li><li><a href="#メンタルモデルを組み立てる">メンタルモデルを組み立てる</a></li><li><a href="#履歴から学ぶ">履歴から学ぶ</a></li><li><a href="#逆算して考える">逆算して考える</a></li><li><a href="#百回測って-一度で切る">百回測って、一度で切る</a></li><li><a href="#より大きな変更を設計する">より大きな変更を設計する</a></li><li><a href="#それでも計画ドキュメントが欲しい">それでも計画ドキュメントが欲しい</a></li><li><a href="#実際のワークフロー">実際のワークフロー</a></li><li><a href="#計画の技術">計画の技術</a></li></ol></nav></details>
+<article id="article">
+<p>このページは、Lauren Tan（@poteto）が X に公開した記事「The Complete Guide to pstack Pt. 2」の非公式日本語訳です。このリポジトリ独自の実践入門ではありません。原文は <a href="https://x.com/poteto/status/2097732320606507506">https://x.com/poteto/status/2097732320606507506</a> です。第1部は <a href="part-1.md">part-1.md</a> です。取得日は 2026-09-13 です。</p>
+<p>前回の投稿では、エージェントで私がやるすべての土台が検証であること、自分の検証スキルを作り始める方法を見せました。要点は、エージェントが自分の作業を確かめられないなら、他は何も意味がない、ということです。あなたがボトルネックのままになり、一日中エージェントの世話をすることになります。</p>
+<p>検証が動くようになったあとの次の問いは、実際に何を作るかをどう決めるかです。</p>
+<p>この投稿では、pstack で調査、計画、プロトタイピング、アーキテクチャをどう進めるかを歩きます。月に数千本の PR を本番へ出しながら、コード品質を極端に高く保つ、まさにその手順です。</p>
+<h2 id="自分より賢い相手を監督する技術">自分より賢い相手を監督する技術</h2>
+<p>2024 年の昔は、システムに何か変更を入れるには、まず十分読んで、何が起きているかのメンタルモデルを作る必要がありました。コードベースの大きさと複雑さ次第で、何時間、ときには何日、何か月かかることもありました。小さな変更なら、小さなサブシステムの局所的な理解で足りることもありました。中核をリファクタするなら、正しく効果的にやるために、全体がどう動くかのメンタルモデルがほぼ必要でした。</p>
+<p>エージェントはこの障壁を明らかに取り除きます。コードをどれだけ知っているかに関係なく、エージェントに頼めば変更できます。しかしコードとユーザー体験の品質を高く保つのは、まだ難しいです。特に、何を見て何を聞くべきかを知っている領域の専門家でなければそうです。</p>
+<p>フロンティアモデルは非常に有能になりましたが、私が絶えず見る失敗モードはまだ 2 つあります。</p>
+<ul><li>指定が不足している、または悪いので、あなたの意図を完全に理解できない。</li><li>作業を正しくやるための文脈が足りない。</li></ul>
+<p>この二つはつながっています。エージェントをうまく使うことは、高品質な文脈でエージェントのコンテキストウィンドウをどれだけ準備できるかに尽きます。これをせずに動くコードは書けます。しかし、高品質な仕事に必要なものをすべて渡す作業をしたときのほうが、結果と品質はずっと良いです。</p>
+<h2 id="エージェント自身の言葉で">エージェント自身の言葉で</h2>
+<p>フロンティアモデルは非常に有能なコーダーです。古いモデルでは、やってほしいことを非常に具体的に指示し、ほとんどマイクロマネジメントしていました。最新のモデルは、あなたや私より上手にコードを書けます。だから、達成してほしいことは伝えつつ、自分が思いつかないやり方で解く自由も渡す、というバランスを取りたいのです。</p>
+<p>これが、自分より賢い相手を監督する技術です。自分で書いていないコードベースの上で、人間がコードベース全体のメンタルモデルを頭に収められなくなった場所で、それをやります。</p>
+<p>私が好む技法の一つが、間接的なプロンプトです。欲しいものを正確に伝える代わりに、エージェント自身の言葉で引き出すようにします。</p>
+<p>たとえば Slack で問題が報告されたとき、私はしばしば、何かをする前にスレッドを読み、問題をエージェント自身の言葉で言い直させます。</p>
+<p>たとえば次のように言います。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode read this slack thread. restate in your own words and in plain english what you think the underlying issue is
+</code></pre></div>
+<p>これで三つのことが起きます。</p>
+<p>第一に、騒がしい会話を、構造化された問題文へ圧縮させます。第二に、誤解をすぐ捕まえられます。スレッドの赤いニシンに固着したら、コードを書き始める前にすぐ直せます。</p>
+<p>第三に、自分の前提や仮説を述べて、誤った道へ連れて行ったり、エージェントが本来達成できたことを制限したりせずに済みます。その前提が間違っているかもしれないからです。</p>
+<h2 id="メンタルモデルを組み立てる">メンタルモデルを組み立てる</h2>
+<p>自分より賢い相手と働くとき、あなたが理解できる形で言い直させることは重要です。それが <code>/teach</code> の着想です。エージェントが直観的なやり方で説明するためのスキルです。エージェントがしていることが自分に意味をなすかを確かめたいときに使います。</p>
+<p>内部では、<code>/teach</code> は <code>/how</code> と <code>/why</code> を呼び出します。</p>
+<p><code>/how</code> は実行時の仕組みを辿ります。<code>/how</code> を聞くと、エージェントはサブシステムの複雑さを見ます。複数ディレクトリやサービスにまたがるなら、Grok のような速くて効率的なモデルで、並列の explorer エージェントを spawn します。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/how is virtualization implemented?
+</code></pre></div>
+<p><code>/why</code> は動機と意図を調べます。コードは何が起きるかを伝えます。なぜそう書いたかは、めったに伝えません。<code>/why</code> を走らせると、pstack は複数の出典を並列に調べます。Git 履歴と PR レビューコメント、Linear チケット、Notion の設計ドキュメント、Slack の会話、Datadog のモニタ、Sentry のエラー、コードの系譜、分析ウェアハウスのイベントです。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/why are we still stuck an old version of node.js?
+</code></pre></div>
+<p>エージェントに何か言い直させて、理解と信頼を上げたいときは <code>/teach</code> を使います。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/teach me why you implemented it this way and not &lt;other way&gt;. what were the tradeoffs you made and why?
+</code></pre></div>
+<p>実務では、<code>/teach</code> の調査は人間だけでなくエージェントにも役立つとわかりました。最新のフロンティアモデルでも（ハーネスの質にも依りますが）、一般に、データや、仕組みのメンタルモデルを作るのに必要なコードを読まずに、自信満々に述べることが多いです。だから、何をしようとしているか、なぜかを教える行為は、エージェント自身にも役立ちます。</p>
+<h2 id="履歴から学ぶ">履歴から学ぶ</h2>
+<p>私のプロジェクトの多くは、複数の会話にまたがります。たとえば数か月前、Cursor で報告されていた仮想化の不具合と perf の問題を直していました。新しいチャットを始めるたびに、似た問題を解いていたときの豊かな文脈を、ほぼ一から作り直す必要がありました。</p>
+<p>気づいたのは、過去のトランスクリプトが豊かな文脈の金鉱だということです。pstack には <code>/recall</code> があり、チャット履歴から最近の文脈を引きます。新しいエージェントでも、良い状態に戻るための正しい文脈を持てます。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/recall the work i did yesterday on virtualization and then read this bug report on slack
+</code></pre></div>
+<p><code>/teach</code>、<code>/recall</code>、<code>/how</code>、<code>/why</code> で、自分のコードベースのメンタルモデルを最新に保ち、覚えやすく理解しやすい形へ圧縮しています。エージェントにも役立ちます。</p>
+<h2 id="逆算して考える">逆算して考える</h2>
+<p>問題がわかったら、解をどう指定しますか。</p>
+<p>計画モードを持つハーネスの多くは、実装の詳細を過剰に指定し、それ以外を過少に指定すると私は思っています。だから pstack では、冗談めかして「計画は信じていない」と書きました。実際は計画します。ただしコードを通して計画します。</p>
+<p>共有コードや、他の人が使うパッケージを作る種類の仕事では、readme driven development を強く信じています。馴染みがなければ、昔よく使われた開発の技法で、まず readme を書きます。開発者体験の帽子を被り、仮想のユーザー向けに API を先に書き、そこから実装とアーキテクチャへ逆算します。</p>
+<p>たとえば社内のデスクトップアプリ向けクライアントフレームワーク Dune を作ったとき、まずチュートリアルを書き、それでアプリを作る感覚を理解しようとしました。少なくともそうしようとしました。エージェントから良くて読めるものを出すのは本当に苦労しました。だから先に刃を研ぐ時間を取り、<code>/technical-writing</code> スキルを作りました。</p>
+<p><code>/technical-writing</code> なしの最初の readme は、目的が混ざっていて読むのが苦痛でした。チュートリアル、ハウツー、アーキテクチャの説明、API リファレンスを同じ文書にしようとし、いつもの AI のスロップと気どった散文で書かれていました。</p>
+<p><code>/technical-writing</code> は Diátaxis フレームワークを使い、文書を四つのモードに分けます。</p>
+<ul><li>Tutorial: やって学ぶ。新参者が一連の手順で、目に見えるものを作る授業です。</li><li>How-to guide: 経験者向けに、具体的で現実の問題を解く手順です。</li><li>Reference: 機械、API、設定フラグの、乾いて完全で権威ある技術記述です。</li><li>Explanation: 背景、設計判断、トレードオフを照らし、明らかにする高いレベルの議論です。</li></ul>
+<p><code>/unslop</code> も使うので、非常に読みやすい文書になります。</p>
+<p>この書き方で計画すると、エージェントが自分の作業を照合できる具体的な目標ができます。エージェントが何を作るかも、ずっと理解しやすくなります。</p>
+<p>設計の段階では、pstack の多くのスキルがここで合成されます。たとえば次です。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">(1) /recall my work fixing virtualization bugs and perf issues from the past 7 days. use /how and /why to understand how our current virtualization implementation works.
+
+(2) then use /poteto-mode planning and /technical-writing to come up with a new virtualization engine that categorically eliminates flickering and jittering. let&#x27;s start by writing a tutorial on how i would use this new package to virtualize a React app
+
+(3) after you write the plan, /teach me and prove to me why this new approach is superior to our current engine
+</code></pre></div>
+<p>この技法の要点は、興味深く豊かな文脈を引き出し、エージェントが問題をあなたと同じように見られるようにすることです。小さな切片としてだけではなく、です。</p>
+<ul><li>プロンプトの第一部は、アプリで仮想化がどう実装されているかについて、過去と現在の関連文脈を思い出します。</li><li>第二部は、以前直した不具合などの文脈を使い、それらの問題をまるごと消す新しい設計を考えさせます。</li><li>最後は、この新しいパッケージが優れていることを証明させます。ここで、検証スキルのような高品質な道具が重要になります。</li></ul>
+<h2 id="百回測って-一度で切る">百回測って、一度で切る</h2>
+<p>計画するとき、よく見る間違いは二つです。</p>
+<ul><li>エージェントの最初の設計を受け入れる。</li><li>経験的な証拠なしに計画を煮込みすぎる。</li></ul>
+<p>人間がコードを書いていたころは、設計ドキュメントでよく協働していました。高いレベルのアーキテクチャ、検討した代替、トレードオフ、珍しい実装メモを話す文書です。落ち着いた設計に至るまで、何度も改稿するのが普通でした。</p>
+<p>エージェントでは設計ドキュメントの儀式は飛ばせますが、エージェントが最初に返したものを受け入れてしまう誤りをよく見ます。pstack では、「二度測って一度切る」を極限まで持っていけます。並列エージェントを使います。</p>
+<p>それをやるのが、プロトタイピングのプレイブックです。</p>
+<p>pstack では、プレイブックはスキルではなく、<code>/poteto-mode</code> の中の参照ファイルです。作業の種類に応じて条件付きで読み込まれます。トークン効率のためです。0.15.0 時点で 23 のプレイブックがあり、それぞれ私が作業するときの手順が入っています。</p>
+<p>スキルと違い、プレイブックは <code>/poteto-mode</code> の一部としてエージェントが自動で使います。たとえば次です。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode prototype a few options for the new dropdown menu
+/poteto-mode fix this bug
+/poteto-mode eval this skill change
+</code></pre></div>
+<p>プロトタイピングは、私が一番好きな pstack のプレイブックの一つです。一つの目標に何度も当たり、最良の選択肢をエージェントに考えさせます。見た目のプロトタイプだけでなく、機能や不具合修正などの違う解を試作するときにも使えます。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode prototype a few options for &lt;feature request&gt;. use /control-app* and take videos/screenshots for me to review and choose from
+</code></pre></div>
+<p>注: <code>/control-app</code> は第1部で作った検証スキルです。</p>
+<p>見た目の変更を試作するとき、エージェントはアプリの中か、作業用ディレクトリに捨てるスケッチを作ります。UI の操作を試すなら、2 つまたは 3 つの変異を簡単な切替の後ろに置きます。それから <code>/control-app</code> で操作し、各変異のスクリーンショットを撮り、実際のタイミングやレイアウトを測ります。</p>
+<p>プロトタイピングは、コードでやる計画です。エージェントが問題空間を探る自由を持ち、自分では思いつかないもので驚かせる余地を与えます。プロトタイプは、私の入力を待たずに、経験的な証拠で自分の問いに答えられます。</p>
+<h2 id="より大きな変更を設計する">より大きな変更を設計する</h2>
+<p>エージェントの時代のエンジニアとして、私が時間を使うべきなのはアーキテクチャ、正しいデータ構造の選択、作るシステム同士がどう協働するかです。実装の詳細はエージェントが埋めます。</p>
+<p>pstack が同梱するもう一つの有用なスキルが <code>/architect</code> です。設計を、区切られた厳密な段階にします。</p>
+<ul><li>Ground the problem。エージェントは影響するシステムに <code>/how</code> と <code>/why</code> を走らせ、既存の所有と制約の正確なメンタルモデルを作ります。</li><li>Sketch。エージェントはアーキテクチャの arena に入ります。独立した候補 runner を並列に spawn し、しばしば違うモデル家系にまたがります。各 runner は grounding の brief を受け、完全な設計パッケージを書きます。呼び出し側の usage sketch、中核の型定義、公開関数のシグネチャ、短い根拠です。ふつうは、呼び出し側をどう見せたいかから導いた型シグネチャだけをスケッチします。各 runner は interface depth を評価し、弱いモデルでの失敗モードを見、設計の赤い旗のカタログで検査しなければなりません。</li><li>Cross-judge and Synthesize。メインエージェントと違うモデルの cross-judge エージェントが、厳しいルーブリックで候補を評価します。</li><li>Implement against the sketch。エージェントはスケッチの仮本体を本物の論理に置き換えます。実装中に、想定外の引数や追加状態が必要だとわかったら、その食い違いを表に出します。</li><li>Scrap when the design is wrong。実装中にスケッチが間違っていたとわかったら、全部捨ててやり直します。</li></ul>
+<p>要点は、エージェントに自己完結した小さなループを渡すことです。違うモデル家系からの複数の競合設計を一つの最適なやり方へ合成し、厳密であり、経験的な証明でアーキテクチャが間違っていたら捨てることを恐れない。同じ回避が無関係な呼び出し側に何度も出る、型が <code>any</code> や強制キャストのような逃げ穴を必要とする、それがアーキテクチャが間違っている経験的な証明です。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/architect this new &lt;feature request&gt;
+</code></pre></div>
+<p>大きな教訓は、<code>/poteto-mode</code> のプロトタイピングと <code>/architect</code> で、コードを使って計画するほうがはるかに効果的だということです。</p>
+<p>抽象計画を敵対的にレビューしない理由も同じです。エージェントは理論上のリスクを幻覚し始め、起きない問題を守るための複雑なエッジケースを発明します。まだ抽象な計画を煮込みすぎないでください。開いた問いは、プロトタイピングと自分の作業の検証で、エージェントに答えさせてください。</p>
+<h2 id="それでも計画ドキュメントが欲しい">それでも計画ドキュメントが欲しい</h2>
+<p>pstack に計画スキルはありませんが、複数フェーズの計画プレイブックは同梱しています。気に入った設計が出たあと、戦術的な実行計画を作るために使います。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode turn this design into a plan
+</code></pre></div>
+<p>計画のすべてのタスクは、証明と検証を軸に組まれます。プレイブックは、テストだけでは検証として足りないとエージェントに伝えます。コードを実際に走らせ、動くことを確かめたときだけ、検証済みです。</p>
+<p>すべての計画は、構造と書式を検証する自動スクリプトで検査されます。承認されたら、項目ごとに実行します。各 PR は小さく、自己完結し、レビューしやすいです。</p>
+<p>本当に大きなプロジェクト（1 週間かかるようなもの）では、進行中の作業を他のエージェントに知らせるため、計画を一時的にコードベースへコミットすることがあります。終わったら消します。コードベースを混乱した状態に残したくないからです。計画を永久に残す価値は、私は感じていません。</p>
+<h2 id="実際のワークフロー">実際のワークフロー</h2>
+<p>これらの部品がどうはまるかを見るために、私がこれらの手順をどうプロンプトするか、具体例を三つ、実際には四つ歩きます。</p>
+<h3 id="例1-曖昧な不具合を調べる">例1: 曖昧な不具合を調べる</h3>
+<p>本番で問題が出て、根本原因がはっきりしないときです。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode investigate why background workers periodically fail with timeout errors. give me a breakdown of what we know, what data you used, and your best hypotheses.
+</code></pre></div>
+<p>エージェントはコードを探り、メトリクスと過去のコミットを並列に見、問題がどこにありそうかの、いちばん良い推測を返します。</p>
+<h3 id="例2-新しいサービス境界を設計する">例2: 新しいサービス境界を設計する</h3>
+<p>他モジュールが依存する新しいサブシステムを入れるときです。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode we need to add rate limiting for external webhooks. /architect this first, and answer any open questions with prototypes. let me review before proceeding.
+</code></pre></div>
+<p>エージェントは既存の webhook アーキテクチャを接地し、複数モデルで競合する設計 runner を回し、捨てるプロトタイプでベンチし、きれいで検証済みのインタフェースを出します。</p>
+<h3 id="例3-複数-pr-の移行を実行する">例3: 複数 PR の移行を実行する</h3>
+<p>多くのファイルにまたがる複雑なリファクタを実行するときです。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode create a plan to migrate our entire UI library to StyleX. break the migration into small, verifiable PRs. each PR must have its visual regression tests and live verification steps. i want the final result to be 100% identical compared to the original - bugs included
+</code></pre></div>
+<p>エージェントは作業を独立した段階に分け、監査できるチェックリストを書き、各単位を作り、確かめ、安全に入れられるようにします。</p>
+<h3 id="例4-slack-で人が報告したものを直す">例4: Slack で人が報告したものを直す</h3>
+<p>社内の issue やフィードバックチャネルの Slack で私を見たことがあれば、次の定番を見たことがあるでしょう。</p>
+<div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text"># thread already has sufficient context
+/poteto-mode do it
+
+/poteto-mode repro this with /control-app. if it repros on main, fix it and show me a video as proof
+</code></pre></div>
+<p>ここで話したスキルの多くは、すでに <code>/poteto-mode</code> が自動で使います。ほとんどの場合は <code>/poteto-mode</code> だけでよく、あとは自分の生活に戻ればよいのです。</p>
+<h2 id="計画の技術">計画の技術</h2>
+<p>Plan Mode は、エージェントが正しいことをすると自分を納得させる手段として使われがちです。実際には、抽象計画は進捗の錯覚しか与えません。長く厚い計画は、あなたとエージェントがとても生産的だったように見えます。中身はたぶん足りません。</p>
+<p>pstack は、徹底した調査、経験的な証拠、厳密な検証を組み合わせる道具を渡します。こう計画すると、エージェントとのエンジニアリングは賭けのように感じなくなります。予測でき、繰り返せます。</p>
+<p>読んでくれてありがとう。第3部をお待ちください。</p>
+</article>
+<footer>
+<p>Lauren Tan（@poteto）の非公式日本語訳です。このリポジトリ独自の実践入門ではありません。</p>
+<p>原文: <a href="https://x.com/poteto/status/2097732320606507506">https://x.com/poteto/status/2097732320606507506</a></p>
+<p>取得日: 2026-09-13。status id: 2097732320606507506。</p>
+</footer>
+</main>
+</div>
+<p id="copy-status" class="sr-only" aria-live="polite"></p>
+<script>
+document.querySelectorAll('.copy-button').forEach(button => {
+  button.addEventListener('click', async () => {
+    const code = button.closest('.code-block').querySelector('code');
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      button.textContent = 'コピーしました';
+      document.getElementById('copy-status').textContent = 'コードをコピーしました';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      button.textContent = '選択しました';
+      document.getElementById('copy-status').textContent = 'コードを選択しました。コピーのショートカットキーを使ってください';
+    }
+    setTimeout(() => {button.textContent = 'コピー';}, 2500);
+  });
+});
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      document.querySelectorAll('.desktop-toc a').forEach(link => {
+        if (link.hash === '#' + entry.target.id) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+  }, {rootMargin:'-5% 0px -70% 0px'});
+  document.querySelectorAll('article h2').forEach(heading => observer.observe(heading));
+}
+</script>
+</body>
+</html>
