@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23246653'/%3E%3Ctext x='18' y='45' fill='white' font-family='sans-serif' font-size='43'%3Ep%3C/text%3E%3C/svg%3E">
+<meta name="description" content="pstackの日本語実践ガイド。Cursorへの導入、最初の演習、検証スキル、設計、PR、Cloud Agents、長時間運用を解説。">
+<title>pstack実践入門 | 日本語ガイド</title>
+<style>
+:root{color-scheme:light;--paper:#faf9f5;--ink:#242b2a;--muted:#57635f;--line:#d7dcd5;--accent:#246653;--code:#f0f2ed;--warm:#b6592f}
+*{box-sizing:border-box}
+html{scroll-padding-top:2rem}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:17px;line-height:1.95;overflow-wrap:anywhere}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+a:hover{color:#123c30}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre:focus-visible,.table-scroll:focus-visible{outline:3px solid var(--warm);outline-offset:4px}
+.skip-link{position:absolute;left:1rem;top:-100px;background:white;padding:.5rem 1rem;z-index:10}
+.skip-link:focus{top:1rem}
+.masthead{max-width:1290px;margin:auto;padding:24px 40px 18px;display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.1em;font-weight:650}
+.masthead a{text-decoration:none}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:66px;max-width:1240px;margin:auto;padding:48px 40px 100px}
+.desktop-toc{align-self:start;position:sticky;top:25px;max-height:calc(100vh - 50px);overflow:auto;padding:0 14px 20px 0;font-size:12px;line-height:1.65}
+.nav-title{margin:0 0 16px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.15em}
+nav ol{padding:0;margin:0;list-style:none}
+nav li{margin:0 0 11px}
+nav a{text-decoration:none;color:var(--muted);display:block;padding:2px 0}
+nav a:hover,nav a[aria-current="location"]{color:var(--accent);text-decoration:underline}
+.main-column{min-width:0;max-width:830px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent);margin:0 0 18px}
+h1{font-size:clamp(29px,3.4vw,43px);line-height:1.5;letter-spacing:-.035em;font-weight:780;margin:0 0 24px;text-wrap:balance}
+.subtitle{font-size:17px;line-height:1.8;color:var(--muted);margin:0 0 24px}
+.meta{display:flex;gap:10px 24px;flex-wrap:wrap;font-size:12px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 0;margin-bottom:22px}
+.downloads{display:flex;flex-wrap:wrap;gap:10px 20px;margin:0 0 42px;font-size:13px}
+.downloads a{font-weight:600}
+.mobile-toc{display:none}
+article>p{margin:0 0 1.4em}
+article h2{font-size:26px;line-height:1.65;letter-spacing:-.025em;margin:3.5em 0 1.1em;padding-top:1.1em;border-top:2px solid var(--ink);text-wrap:balance}
+article h3{font-size:20px;line-height:1.75;margin:2.2em 0 .8em}
+article strong{font-weight:750}
+article li{margin:.4em 0}
+article ul,article ol{padding-left:1.5em;margin:1em 0 1.5em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.87em}
+p code,li code,td code{background:var(--code);padding:2px 5px;border-radius:3px}
+.code-block{margin:1.3em 0 1.8em;background:var(--code);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.code-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:7px 14px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.copy-button{font:inherit;font-size:11px;cursor:pointer;color:var(--accent);background:transparent;border:1px solid #bcc9c2;border-radius:3px;padding:4px 10px;min-height:30px}
+.copy-button:hover{background:#e0e7df}
+pre{margin:0;padding:19px 20px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2;overflow:auto}
+pre code{font-size:13px}
+.table-scroll{overflow-x:auto;margin:1.3em 0 1.9em}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.8;min-width:460px}
+th,td{text-align:left;vertical-align:top;padding:13px 12px;border-bottom:1px solid var(--line)}
+th{background:#edf1ea;font-weight:700;border-top:1px solid var(--line)}
+td:first-child{font-weight:600}
+footer{font-size:12px;line-height:1.8;color:var(--muted);border-top:1px solid var(--line);margin-top:4rem;padding-top:1.5rem}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:1050px){.layout{gap:35px;grid-template-columns:210px minmax(0,1fr);padding:35px 28px}.masthead{padding-left:28px;padding-right:28px}body{font-size:16px}}
+@media(max-width:780px){.layout{display:block;padding:28px 22px 60px}.desktop-toc{display:none}.mobile-toc{display:block;margin:0 0 32px;border:1px solid var(--line);padding:12px 16px;background:#f3f4ef;font-size:13px}.mobile-toc summary{cursor:pointer;font-weight:650}.mobile-toc nav{margin-top:18px}.masthead{padding:17px 22px;font-size:10px;letter-spacing:.04em}.masthead span:last-child{display:none}h1{font-size:29px}.subtitle{font-size:15px}.downloads{margin-bottom:25px}article h2{font-size:22px;margin-top:2.8em}article h3{font-size:18px}.meta{font-size:11px}pre{padding:15px}pre code{font-size:12px}table{font-size:13px}}
+@media print{@page{margin:18mm}body{background:#fff;font-size:10.5pt;line-height:1.75}.masthead,.desktop-toc,.mobile-toc,.copy-button,.downloads{display:none}.layout{display:block;padding:0;max-width:none}.main-column{max-width:none}h1{font-size:24pt}article h2{font-size:17pt;margin-top:2em;break-after:avoid}article h3{font-size:13pt;break-after:avoid}a{color:inherit;text-decoration:underline}.table-scroll{overflow:visible}table{min-width:0;font-size:9pt}tr{break-inside:avoid}.code-block{break-inside:avoid}pre code{font-size:9pt}.meta{margin-bottom:24px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#article">本文へ移動</a>
+<div class="masthead"><a href="#top">ENGINEERING NOTES / PSTACK</a><span>JAPANESE GUIDE</span></div>
+<div class="layout">
+<aside class="desktop-toc"><p class="nav-title">CONTENTS / 目次</p><nav aria-label="章の目次"><ol><li><a href="#chapter-01">1. まず覚えるのは <code>/poteto-mode</code> だけ</a></li><li><a href="#chapter-02">2. 導入する前に、必要なものを揃える</a></li><li><a href="#chapter-03">3. Cursorにpstackをインストールする</a></li><li><a href="#chapter-04">4. 最初の実践：小さなCLIにJSON出力を追加する</a></li><li><a href="#chapter-05">5. 依頼文は「目的・制約・証拠」で組み立てる</a></li><li><a href="#chapter-06">6. 本格運用の土台：アプリ専用の検証スキルを作る</a></li><li><a href="#chapter-07">7. 検証スキルを育てる：作って終わりにしない</a></li><li><a href="#chapter-08">8. 既存コードを理解する四つの入口</a></li><li><a href="#chapter-09">9. 大きな変更は、設計を実物で比較する</a></li><li><a href="#chapter-10">10. 不具合修正と性能改善で、頼み方を変える</a></li><li><a href="#chapter-11">11. PRを作る、マージ可能にする、マージする</a></li><li><a href="#chapter-12">12. 長時間任せるときは、終わり方を先に決める</a></li><li><a href="#chapter-13">13. 複数エージェントとCloud Agentsへ広げる</a></li><li><a href="#chapter-14">14. 繰り返しの失敗を、次の仕組みに変える</a></li><li><a href="#chapter-15">15. 毎日の運用に落とし込む</a></li><li><a href="#chapter-16">16. よくあるつまずきと対処</a></li><li><a href="#chapter-17">17. コマンド早見表</a></li><li><a href="#chapter-18">18. 最初の一週間の進め方</a></li><li><a href="#chapter-19">付録：この記事の対象と、確認した範囲</a></li></ol></nav></aside>
+<main class="main-column" id="top">
+<header>
+<p class="eyebrow">使いながら学ぶ、AI開発の手順</p>
+<h1>pstack実践入門：AIに「書いてもらう」から「動くことまで確かめてもらう」へ</h1>
+<p class="subtitle">Cursorへの導入から、検証スキル・PR・長時間運用まで使いこなす。</p>
+<div class="meta"><span>2026.09.12 調査</span><span>pstack 0.15.2</span><span>全18章 + 参照資料</span><span>動かせる教材つき</span></div>
+<div class="downloads"><a href="pstack-first-project.zip" download>練習プロジェクトをダウンロード</a><a href="pstack-guide-ja.md" download>Markdown原稿</a><a href="https://github.com/cursor/plugins/tree/main/pstack#readme">公式リポジトリ</a></div>
+</header>
+<details class="mobile-toc"><summary>目次を開く · 全18章</summary><nav aria-label="モバイル用の章の目次"><ol><li><a href="#chapter-01">1. まず覚えるのは <code>/poteto-mode</code> だけ</a></li><li><a href="#chapter-02">2. 導入する前に、必要なものを揃える</a></li><li><a href="#chapter-03">3. Cursorにpstackをインストールする</a></li><li><a href="#chapter-04">4. 最初の実践：小さなCLIにJSON出力を追加する</a></li><li><a href="#chapter-05">5. 依頼文は「目的・制約・証拠」で組み立てる</a></li><li><a href="#chapter-06">6. 本格運用の土台：アプリ専用の検証スキルを作る</a></li><li><a href="#chapter-07">7. 検証スキルを育てる：作って終わりにしない</a></li><li><a href="#chapter-08">8. 既存コードを理解する四つの入口</a></li><li><a href="#chapter-09">9. 大きな変更は、設計を実物で比較する</a></li><li><a href="#chapter-10">10. 不具合修正と性能改善で、頼み方を変える</a></li><li><a href="#chapter-11">11. PRを作る、マージ可能にする、マージする</a></li><li><a href="#chapter-12">12. 長時間任せるときは、終わり方を先に決める</a></li><li><a href="#chapter-13">13. 複数エージェントとCloud Agentsへ広げる</a></li><li><a href="#chapter-14">14. 繰り返しの失敗を、次の仕組みに変える</a></li><li><a href="#chapter-15">15. 毎日の運用に落とし込む</a></li><li><a href="#chapter-16">16. よくあるつまずきと対処</a></li><li><a href="#chapter-17">17. コマンド早見表</a></li><li><a href="#chapter-18">18. 最初の一週間の進め方</a></li><li><a href="#chapter-19">付録：この記事の対象と、確認した範囲</a></li></ol></nav></details>
+<article id="article"><p>AIにコードを書いてもらった。説明も筋が通っている。テストも通った。それでも、実際に使うと動かない。</p>
+<p>この経験がある人にこそ、pstackは役に立ちます。pstackは、AIに仕事を渡すときの手順を整える、開発用のスキル集です。目指すのは、コードの生成量を増やすことよりも、<strong>問題を理解し、適切な変更を加え、その変更が実際に機能するところまで確かめること</strong>です。</p>
+<p>この記事では、最初にCursorへ導入し、小さな練習プロジェクトで一つの変更を完了させます。そのあと、実際のアプリに適用する方法、設計やレビューを深める方法、複数エージェントや長時間の作業へ広げる方法を説明します。</p>
+<p>本ガイドは、Lauren Tan（@poteto）が公開している <a href="https://github.com/cursor/plugins/tree/main/pstack#readme">公式pstack</a> を扱います。</p>
+<p>調査基準日は2026年9月12日。公式リポジトリのコミット <code>889ec4b68fa5aab0e867dad71ec3fdf386ae48f3</code>、プラグイン版 <code>0.15.2</code> に基づきます。以下のプロンプトは本記事の実践例です。画面名や利用可能なモデルは、使っているCursorの版・アカウントによって異なります。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/.cursor-plugin/plugin.json">確認したプラグイン定義</a></p>
+<h2 id="chapter-01">1. まず覚えるのは <code>/poteto-mode</code> だけ</h2>
+<p>pstackにはさまざまなスキルがありますが、最初から全部覚える必要はありません。普段の開発では、Cursorのチャットで次のように依頼します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 注文を再送すると通知が二重に届きます。
+まず再現し、原因を特定して修正してください。
+修正後は同じ手順で通知が1回だけ届くことを確認してください。
+</code></pre></div>
+<p><code>/poteto-mode</code> は、依頼に合った作業手順を選ぶ入り口です。この例なら、不具合修正の手順を選び、再現、調査、修正、検証へと進みます。</p>
+<p>ここで渡している情報は三つです。</p>
+<ol>
+<li><strong>起きていること</strong>：再送すると通知が二重に届く。</li>
+<li><strong>してほしいこと</strong>：原因を特定して直す。</li>
+<li><strong>終わりの条件</strong>：同じ操作をしても通知が1回だけ届く。</li>
+</ol>
+<p>「どのファイルを何行書き換えるか」まで人間が決めなくても、目的と確認方法が具体的なら、エージェントは調査を進められます。</p>
+<p>実行中は、作業リストにも注目してください。pstackは選んだ手順をリストに展開します。省略する手順には理由を残す設計なので、何を調べ、何を省いたのかを追えます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/02-poteto-mode.md">ルーティングの公式ガイド</a></p>
+<h3>スキル、プレイブック、エージェントの違い</h3>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+<th>pstackでの例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>スキル</td>
+<td>特定の仕事を進めるための指示と資料</td>
+<td><code>/how</code>、<code>/architect</code></td>
+</tr>
+<tr>
+<td>プレイブック</td>
+<td>作業の種類に対応する一連の手順</td>
+<td>不具合修正、性能改善、PRの監視</td>
+</tr>
+<tr>
+<td>エージェント</td>
+<td>実際に資料を読み、ツールを使い、作業するAI</td>
+<td>Cursorの親エージェントやサブエージェント</td>
+</tr>
+<tr>
+<td>検証用ハーネス</td>
+<td>アプリを繰り返し操作・観測するための道具</td>
+<td>ブラウザ操作、CLI実行、API呼び出しの仕組み</td>
+</tr>
+</tbody></table></div>
+<p>たとえば、「通知の不具合を直す」という依頼を受けたエージェントが、不具合修正プレイブックに従い、必要な場面で <code>/how</code> などのスキルを使います。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">あなたの依頼
+    ↓
+/poteto-mode が作業の種類を判断
+    ↓
+対応するプレイブック
+    ↓
+調査・設計・実装・検証のスキルと道具
+    ↓
+変更内容と、その変更が動く証拠
+</code></pre></div>
+<p>pstackを入れたからといって、アプリの起動環境や認証情報まで自動的に揃うわけではありません。「仕事の手順」と「実際に操作できる環境」の両方を用意することで効果が出ます。</p>
+<h2 id="chapter-02">2. 導入する前に、必要なものを揃える</h2>
+<p>最初の実践には、次のものを使います。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>必要なもの</th>
+<th>何に使うか</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cursorと、Agentを利用できるアカウント</td>
+<td>pstackを読み込み、作業を実行する</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>変更前後の状態を記録する</td>
+</tr>
+<tr>
+<td>作業するプロジェクト</td>
+<td>AIが読んだり変更したりする対象</td>
+</tr>
+<tr>
+<td>そのプロジェクトの実行環境</td>
+<td>変更後のプログラムを動かす</td>
+</tr>
+</tbody></table></div>
+<p>この記事の練習プロジェクトでは、実行環境としてPython 3.10以上を使います。Pythonはpstack自体の必須要件ではなく、教材の要件です。自分のアプリがNode.jsやGoで動くなら、そのアプリの環境を使います。</p>
+<p>Cursorは <a href="https://cursor.com/">公式サイト</a> から、Gitは <a href="https://git-scm.com/install/">公式のインストール案内</a> から準備できます。Pythonがなければ <a href="https://www.python.org/downloads/">Python公式サイト</a> から導入してください。</p>
+<h3>「ターミナルに入力するもの」と「チャットに送るもの」を分ける</h3>
+<p>初めて使うときに混乱しやすい点です。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">git --version
+python3 --version
+</code></pre></div>
+<p>これは<strong>ターミナル</strong>で実行します。Cursorのターミナルでも構いません。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このコードの動きを説明してください。
+</code></pre></div>
+<p>こちらは<strong>CursorのAgentチャット</strong>へ送ります。ターミナルに <code>/poteto-mode</code> と打つものではありません。</p>
+<p>以降も、シェルコマンドとチャット用プロンプトを区別して掲載します。Windowsで <code>python3</code> が見つからずPython Launcherが使える場合は、教材の <code>python3</code> を <code>py -3</code> に読み替えてください。</p>
+<h3>料金について</h3>
+<p>pstackのソースはMITライセンスで公開されています。ただし、AIモデルやクラウド実行の利用料まで無料になるわけではありません。特に複数モデルの比較と長時間実行は、実行するエージェント数や試行回数が増えます。</p>
+<p>最初は小さな一件で動きを把握し、Cursor側の利用量を確認してから広げましょう。固定の月額や「一回いくら」という数値は、モデルと契約、依頼内容で変わるため本記事では置きません。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/LICENSE">ライセンス</a>・<a href="https://cursor.com/docs/cloud-agent">Cloud Agentsの料金説明</a></p>
+<h2 id="chapter-03">3. Cursorにpstackをインストールする</h2>
+<h3>手順1：作業するフォルダをCursorで開く</h3>
+<p>すでにアプリがある人は、そのプロジェクトを開きます。練習用のプロジェクトを使う人は、次章のZIPを展開したフォルダを開いてください。</p>
+<p>「pstackのソースコードが入ったフォルダ」ではなく、<strong>これから調査・変更したいプロジェクト</strong>を開くのが基本です。</p>
+<h3>手順2：チャットでインストールする</h3>
+<p>Cursorのチャットで入力します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/add-plugin pstack
+</code></pre></div>
+<p>候補が表示されたら、公開元が <code>cursor/plugins</code>、作者がLauren Tanのpstackであることを確認して追加します。名前だけで選ばず、<a href="https://github.com/cursor/plugins/tree/main/pstack#readme">公式README</a>と照合してください。</p>
+<p>GitHubで公開されているからといって、通常利用のために自分でリポジトリをcloneしてビルドする必要はありません。公式の導入手順は、このプラグイン追加です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/01-setup.md">セットアップガイド</a>・<a href="https://cursor.com/docs/plugins">Cursorのプラグイン説明</a></p>
+<h3>手順3：利用するモデルを設定する</h3>
+<p>続けて入力します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/setup-pstack
+</code></pre></div>
+<p>このスキルは、現在の環境で利用できるモデルを確認し、実装、調査、判断、レビューなどの役割ごとに割り当てます。</p>
+<p>初心者は、モデル名をネット上の設定例からそのままコピーするより、検出された候補から選ぶほうが確実です。使えないモデルを設定すると、サブエージェントの起動で止まってしまいます。</p>
+<p>設定時には、たとえば次の希望を伝えられます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">まず小規模な作業で試します。
+利用可能なモデルだけを使ってください。
+各役割の設定と、レビュー時に何体起動するかを説明してください。
+複数モデルを使う必要が薄い役割は親チャットのモデルを継承させたいです。
+</code></pre></div>
+<p>設定は <code>~/.cursor/rules/pstack-models.mdc</code> に保存されます。<code>~</code> はホームフォルダを表します。これはユーザー側のルールなので、プロジェクトのコードとは別の場所です。</p>
+<p><code>auto</code> と <code>inherit-parent</code> は、ここではどちらも「親チャットのモデルを継承する」という意味です。特定モデルの名前ではありません。また、レビュー用のモデル一覧は、項目数に応じてエージェントが起動します。同じ継承指定を複数並べても、一体になるわけではありません。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/setup-pstack/SKILL.md">setup-pstackの定義</a></p>
+<h3>手順4：必要に応じて補助プラグインを追加する</h3>
+<p>pstackの一部のワークフローは、別プラグイン <code>cursor-team-kit</code> のスキルを参照します。コード整理の <code>/deslop</code>、CLIやUI操作用の <code>control-cli</code>、<code>control-ui</code> などです。</p>
+<p>公式が案内する一式で使う場合は、こちらも追加します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/add-plugin cursor-team-kit
+</code></pre></div>
+<p>これはpstackの別名ではなく、補助する道具のセットです。<code>/create-skill</code> や <code>/loop</code> のようにCursor側が提供する機能もあります。<strong>どの機能がpstackに入っていて、どの機能がホストや補助プラグインに属するのか</strong>を分けておくと、見つからないコマンドの原因を追いやすくなります。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/README.md#not-shipped-here">同梱されない依存機能</a></p>
+<h3>手順5：新しいチャットで確認する</h3>
+<p>モデル設定は新しいセッションに適用されるため、セットアップ後に新しいチャットを始めます。</p>
+<p>最初の確認は、書き換えを伴わない依頼で十分です。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このプロジェクトの起動方法と、利用者が触る入り口を調べてください。
+コードは変更しないでください。
+どの資料・ファイルを根拠にしたか示し、日本語で説明してください。
+</code></pre></div>
+<p>スキルが認識され、実際のプロジェクトを読み、調査結果が返ってくれば、最初の準備はできています。依頼を読んだだけで「調べました」と返していないか、根拠のファイルも見ておきましょう。</p>
+<h2 id="chapter-04">4. 最初の実践：小さなCLIにJSON出力を追加する</h2>
+<p>いきなり本番アプリの大改修を任せるより、一件の変更を最後まで見届けるほうがpstackの使い方をつかめます。</p>
+<p>ここでは、支出のCSVを読み込み、件数と合計を表示する小さなプログラムを使います。CLIとは、ターミナルから実行するプログラムのことです。</p>
+<p><strong>教材：<a href="pstack-first-project.zip">pstack-first-project.zipをダウンロード</a></strong></p>
+<p>この教材は本記事用に作成したもので、pstack公式の配布物ではありません。追加パッケージや外部サービス、GitHubアカウントは不要です。</p>
+<h3>手順1：教材を開く</h3>
+<p>ZIPを展開し、<code>pstack-first-project</code> フォルダをCursorで開きます。中身は次のとおりです。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">pstack-first-project/
+  report.py          集計プログラム
+  test_report.py     既存の動作を確認するテスト
+  expenses.csv       3件の支出
+  empty.csv          見出しだけのCSV
+  README.md          教材の使い方
+  .gitignore         Gitに入れないファイルの指定
+</code></pre></div>
+<p>Cursorのターミナルを開き、次を実行します。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">python3 report.py expenses.csv
+</code></pre></div>
+<p>次の表示が出ます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">件数: 3
+合計: 3000円
+</code></pre></div>
+<p>続いて既存のテストを動かします。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">python3 -m unittest -v
+</code></pre></div>
+<p>2件のテストが通り、最後に <code>OK</code> が表示されれば準備完了です。この初期状態の実行と2件のテストは、記事作成時にも確認しています。</p>
+<p><code>can&#39;t open file</code> などが出る場合は、開いているフォルダやターミナルの現在地が違う可能性があります。<code>report.py</code> があるフォルダで実行してください。</p>
+<h3>手順2：変更前をGitに記録する</h3>
+<p>新しく展開した教材フォルダで、一度だけ次を実行します。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">git init -b main
+git add report.py test_report.py expenses.csv empty.csv README.md .gitignore
+git commit -m &quot;chore: add pstack tutorial starter&quot;
+git switch -c practice/json-output
+</code></pre></div>
+<p>最初の3行は、教材の出発点を記録する操作です。最後の1行は、練習用のブランチを作って移動します。ブランチは、元の履歴から分かれて変更を積み重ねる場所です。</p>
+<p>Gitに名前とメールアドレスを求められた場合は、自分の情報を設定してから <code>git commit</code> をやり直します。設定は教材リポジトリだけに限定できます。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">git config user.name &quot;自分の名前&quot;
+git config user.email &quot;自分のメールアドレス&quot;
+</code></pre></div>
+<p>引用符の中は自分の情報に置き換えてください。すでにGit管理されている実プロジェクトでは、この初期化手順を繰り返す必要はありません。</p>
+<h3>手順3：目的と完了条件を送る</h3>
+<p>Cursorのチャットに次を送ります。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode report.py に --json オプションを追加してください。
+
+--json なしの出力は既存と完全に同じにしてください。
+--json ありでは、標準出力を count と total_yen だけのJSONオブジェクトにします。
+expenses.csv は count=3、total_yen=3000、empty.csv は両方0です。
+数値は文字列でなく整数にしてください。
+
+元の出力を変更前に保存し、既存テストと実際のCLI実行で前後を比較してください。
+JSONはパーサーで読み込み、値まで検証してください。
+
+これはローカル演習です。現在の練習ブランチで作業し、commitは可能です。
+push、PR作成、merge、公開は行わず、検証結果を示して終了してください。
+追加パッケージは使わず、解説は日本語でお願いします。
+</code></pre></div>
+<p>JSONは、ほかのプログラムが扱いやすいデータ形式です。今回ほしい出力は、意味としては次のものです。</p>
+<div class="code-block"><div class="code-toolbar"><span>JSONの例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-json">{&quot;count&quot;: 3, &quot;total_yen&quot;: 3000}
+</code></pre></div>
+<p>空白の置き方ではなく、JSONとして読み込めること、キーと値が正しいことが重要です。上のJSONは<strong>追加したい仕様の例</strong>であり、教材に最初から実装済みの出力ではありません。</p>
+<p>このプロンプトで公開しないことを明記したのは、pstackの変更系プレイブックにはPR作成まで進む手順があるためです。今回は学習用なので、ローカルで完結するよう範囲を指定しています。</p>
+<h3>手順4：結果を確認する</h3>
+<p>変更後、エージェントには少なくとも次を実行してもらいます。自分でも同じコマンドを試せます。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">python3 report.py expenses.csv
+python3 report.py expenses.csv --json
+python3 report.py empty.csv --json
+python3 -m unittest -v
+</code></pre></div>
+<p>確認するのは、次の三点です。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>確認項目</th>
+<th>合格の条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>既存の表示</td>
+<td>件数3、合計3000円。改行を含めて元と同じ</td>
+</tr>
+<tr>
+<td>JSON出力</td>
+<td>パーサーで読め、整数の <code>count</code> と <code>total_yen</code> が正しい</td>
+</tr>
+<tr>
+<td>空のデータ</td>
+<td>見出しだけのCSVで件数・合計がともに0</td>
+</tr>
+</tbody></table></div>
+<p>「テストを追加しました」で終わらず、<strong>実際のCLIの実行結果</strong>まで確認します。JSONについても、「エラーなく読み込めた」だけでは足りません。値が全部0でも読み込みは成功するため、期待する値との照合が必要です。</p>
+<p>さらに差分を見たい場合は、ターミナルで次を実行します。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">git diff main
+git status --short
+</code></pre></div>
+<p>エージェントがすでにcommitしていても、<code>git diff main</code> なら出発点からの変更を確認できます。</p>
+<h3>手順5：自分が説明できる状態にする</h3>
+<p>最後に、次を送ってみてください。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/teach 今回の変更を、Python初心者にもわかるように説明してください。
+引数の受け取り、集計、出力の切り替えがどうつながるか知りたいです。
+通常出力を壊していないと判断できる根拠も示してください。
+</code></pre></div>
+<p>ここまでできれば、最初の一周は完了です。AIに変更を頼み、実行結果で確かめ、変更を理解するところまで進められました。</p>
+<h2 id="chapter-05">5. 依頼文は「目的・制約・証拠」で組み立てる</h2>
+<p>pstackへの依頼は長ければよいわけではありません。次の形で考えると、必要な情報が揃います。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode ［何を実現したいか］。
+［守ってほしい制約］。
+［どの操作・結果で完了と判断するか］。
+［どこまで実行してよいか］。
+</code></pre></div>
+<p>たとえば、次の依頼は終わりが曖昧です。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 設定画面を使いやすくしてください。
+</code></pre></div>
+<p>次のようにすると、観測できる結果に変わります。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 設定画面に検索を追加してください。
+設定項目の表示名で絞り込み、検索を消すと全項目に戻るようにします。
+既存の保存処理は変更しないでください。
+実際の画面で検索、検索解除、設定保存、再読み込みを確認してください。
+</code></pre></div>
+<p>「使いやすい」を、検索できる、戻せる、保存できる、再読み込み後も保たれる、という確認可能な挙動に分解しています。</p>
+<h3>対話が続いているときは短くてよい</h3>
+<p><code>/poteto-mode</code> は、その会話で継続するモードとして定義されています。すでに目的と条件が共有されていれば、「続けて」「その方針で実装して」で足ります。</p>
+<p>話題を変えるときは、切り替えを明示します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode new task.
+ログアウト後もキャッシュが残る理由を調べてください。
+今回は調査だけで、修正はしないでください。
+</code></pre></div>
+<p>以前の実装作業の続きとして解釈されないようにするためです。モードを終えたいときも、「この会話ではpoteto-modeを解除してください」と伝えられます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/02-poteto-mode.md">会話の継続と切り替え</a></p>
+<h3>手順を細かく書きすぎない</h3>
+<p>毎回 <code>/how → /why → /architect → /arena</code> のように全部指定すると、依頼に適したプレイブックの順序と食い違うことがあります。</p>
+<p>基本は目的と制約を渡し、特定の判断を変えたいときだけスキル名を指定します。たとえば「設計を見てから実装してほしい」なら、次のようにします。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/architect with checkpoint.
+CSVのインポート機能を設計してください。
+設計案と利用側のコード例を見せ、実装前に止まってください。
+</code></pre></div>
+<p><code>/architect</code> は通常、設計から実装まで進むため、<strong>設計だけ見たい場合にはチェックポイントを明記する</strong>のが重要です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/04-design.md">設計の公式ガイド</a></p>
+<h2 id="chapter-06">6. 本格運用の土台：アプリ専用の検証スキルを作る</h2>
+<p>ここからがpstackを継続的に使ううえでの中心です。</p>
+<p>あるエージェントが頑張ってアプリの起動方法を見つけても、次のエージェントがまたゼロから調べるのでは、毎回同じ時間がかかります。ログイン方法、データの準備、画面への移動も同じです。</p>
+<p>そこで、<strong>アプリを起動し、操作し、結果を確かめる手順を、プロジェクト専用のスキルとして残します。</strong></p>
+<h3>テストと実動作の検証を組み合わせる</h3>
+<p>テストには、特定の条件を素早く繰り返し確認できる利点があります。一方、実際のアプリでは、設定、認証、保存、表示などの組み合わせで問題が起きます。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>変更</th>
+<th>実際に確かめたいこと</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CLIの新オプション</td>
+<td>利用者が打つコマンドで正しい出力になる</td>
+</tr>
+<tr>
+<td>保存ボタン</td>
+<td>ボタンを押すと保存され、再表示しても残る</td>
+</tr>
+<tr>
+<td>API</td>
+<td>リクエストに対する応答と、必要なデータ更新が正しい</td>
+</tr>
+<tr>
+<td>性能改善</td>
+<td>同じ条件で、変更前後の処理時間や負荷が改善する</td>
+</tr>
+<tr>
+<td>移行処理</td>
+<td>実データに相当する入力を読み、期待どおりの出力になる</td>
+</tr>
+</tbody></table></div>
+<p>ビルド、単体テスト、実動作の確認は、それぞれ違う証拠です。一つで全部を代表させず、変更の種類に合うものを選びます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/06-verify-and-ship.md">検証の公式ガイド</a></p>
+<h3>生成コマンドを実行する</h3>
+<p>自分のアプリをCursorで開き、チャットで入力します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/create-verification-skill
+</code></pre></div>
+<p>スキルはまず、プロジェクトから次の情報を調べます。</p>
+<ol>
+<li>利用者が触るのは、Web画面、CLI、APIなどのどれか。</li>
+<li>アプリをどう起動し、起動完了をどう確認するか。</li>
+<li>既存のテストや操作用ツールを利用できるか。</li>
+<li>結果を何で観測できるか。</li>
+<li>複数の検証を同時に走らせても、データやポートが衝突しないか。</li>
+</ol>
+<p>コードからわからない認証方法などは、そこで補足します。既存の操作用ハーネスがある場合は、それを優先する定義になっています。すでにある仕組みを捨てて、別のものを作り直す必要はありません。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/create-verification-skill/SKILL.md">生成スキルの定義</a></p>
+<p>練習プロジェクトで試すなら、次のように範囲を伝えます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/create-verification-skill
+この支出集計CLI向けに作ってください。
+通常出力とJSON出力を、実際のコマンド実行で確認できるようにします。
+ローカル教材なのでpushやPR作成は不要です。
+生成した手順を一度実行し、後片付け後にも証拠が残ることを確認してください。
+</code></pre></div>
+<h3>何が生成されるのか</h3>
+<p>基本の保存先は次の形です。<code>&lt;app&gt;</code> の部分はプロジェクトに応じて決まります。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">.cursor/skills/verify-&lt;app&gt;/
+  SKILL.md
+  features/
+    README.md
+    機能ごとの説明ファイル
+  必要に応じた操作・検証用スクリプト
+</code></pre></div>
+<p><code>SKILL.md</code> の中心は、次の五つです。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>書くこと</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Launch</td>
+<td>起動方法と、準備完了の見分け方</td>
+</tr>
+<tr>
+<td>Doctor</td>
+<td>操作してよい正常な環境かどうかの確認</td>
+</tr>
+<tr>
+<td>Drive</td>
+<td>実際の利用者の経路に沿った操作方法</td>
+</tr>
+<tr>
+<td>Evidence</td>
+<td>何を証拠として、どこへ保存するか</td>
+</tr>
+<tr>
+<td>Cleanup</td>
+<td>自分が起動したものや一時データの後片付け</td>
+</tr>
+</tbody></table></div>
+<p>Doctorは、たとえば「指定ポートのアプリが起動している」「想定する版である」「テストユーザーでログインできる」を確かめる入口です。違う環境を操作して得た結果を、成功の証拠にしないためにあります。</p>
+<p>また、生成しただけでは完成ではありません。現在の定義は、起動、Doctor、少なくとも一つの機能の操作、証拠保存、後片付けを一度通して実行することを求めます。最後に、<strong>保存した証拠がCleanupで消えていないこと</strong>まで確認します。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/create-verification-skill/SKILL.md">生成物と実証の要件</a></p>
+<h3>Feature Mapは「どこで何ができるか」の地図</h3>
+<p>Feature Mapは、ファイル名や関数名を並べた索引ではありません。利用者の視点で、機能への辿り方と確認すべき結果を示します。</p>
+<p>たとえば「設定の保存」なら、次のような内容です。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>知りたいこと</th>
+<th>記載例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>何の機能か</td>
+<td>通知のオン・オフを保存する</td>
+</tr>
+<tr>
+<td>どう辿り着くか</td>
+<td>設定画面を開き、通知タブへ移動する</td>
+</tr>
+<tr>
+<td>どう操作するか</td>
+<td>通知設定を変更し、保存ボタンを押す</td>
+</tr>
+<tr>
+<td>何が成功の証拠か</td>
+<td>再読み込み後にも設定が維持される</td>
+</tr>
+<tr>
+<td>注意点</td>
+<td>テストアカウントが必要。権限によって項目が非表示になる</td>
+</tr>
+</tbody></table></div>
+<p>現在の生成定義では <code>features/README.md</code> を索引にし、各機能のファイルに <code>Sub-features</code>、<code>How to get to it (user POV)</code>、<code>Driving it with &lt;harness&gt;</code>、<code>Gotchas</code> という見出しを使います。添付の解説記事にある <code>references/features</code> という配置とは異なるため、実際の生成結果を基準にしてください。<a href="https://github.com/cursor/plugins/tree/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/create-verification-skill/references/feature-map-example">Feature Mapの公式例</a></p>
+<h3><code>/control-app</code> は、全員が同じ名前で使えるコマンドではない</h3>
+<p>Lauren Tanの解説には <code>/control-app</code> という呼び出しが出てきます。これは、アプリ用に作られた検証スキルを表す例として読む必要があります。</p>
+<p>自分の環境では、生成された <code>SKILL.md</code> の <code>name</code> とCursorの候補に出る名前を確認します。たとえば <code>verify-expense-report</code> という名前で生成された場合に、そのスキルを呼び出します。<strong>スキル名を確認する前に、記事中の例を固定コマンドだと思わないこと</strong>が大切です。</p>
+<h2 id="chapter-07">7. 検証スキルを育てる：作って終わりにしない</h2>
+<p>アプリの画面や操作方法が変われば、検証手順も古くなります。その状態を放置すると、AIは「存在しないボタンを押そうとする」「新機能を一度も検証しない」といった問題を起こします。</p>
+<p>更新には次を使います。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/maintain-verification-skill
+</code></pre></div>
+<p>このスキルは、機能ごとのソース調査を並行して行い、そのあと実際のアプリでFeature Mapの全機能を確認します。長く動くUIやサーバーは、調整役が一つのインスタンスを順に操作します。短命のCLIなら、生成されたLaunch手順に沿って実行ごとに独立したセッションを使います。</p>
+<p>ソースを読む作業は分担し、同じアプリへの書き込み操作は調整する。この分け方が、誤操作や状態の奪い合いを防ぎます。</p>
+<p>結果は三種類です。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>結果</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>clean</code></td>
+<td>ソースと実動作の確認が完了し、修正不要</td>
+</tr>
+<tr>
+<td><code>changed</code></td>
+<td>証明できた検証スキル・操作スクリプト・地図の修正を一つのPRにする</td>
+</tr>
+<tr>
+<td><code>blocked</code></td>
+<td>確認や安全な修正完了を妨げる具体的な事情がある</td>
+</tr>
+</tbody></table></div>
+<p>この作業で変更するのは、検証スキル自身のディレクトリです。<strong>アプリ本体の不具合は、手順書の記述を変えて隠さず、製品側の問題として報告します。</strong> 本体の修正は別の作業です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/maintain-verification-skill/SKILL.md">保守スキルの定義</a></p>
+<p>実行頻度は開発の変化量で決めます。毎日画面が変わるなら頻繁に、安定しているなら機能変更時に行う、といった運用が考えられます。現在の生成スキルは、保守を案内しますが、定期実行を勝手に設定するものではありません。</p>
+<p>「毎日回す」とチャットに書いた場合も、実際にスケジュール機能へ登録されたか、次回実行が存在するかを確認します。会話の約束だけで、翌日の実行が始まるとは限りません。</p>
+<h2 id="chapter-08">8. 既存コードを理解する四つの入口</h2>
+<p>仕事でpstackを使うと、新規開発以上に「前からあるコードを理解する」時間が重要になります。</p>
+<p>そのときは、知りたいことによってスキルを選びます。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>スキル</th>
+<th>答える問い</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/how</code></td>
+<td>今、どう動いているか</td>
+</tr>
+<tr>
+<td><code>/why</code></td>
+<td>なぜ、その設計・実装になったのか</td>
+</tr>
+<tr>
+<td><code>/teach</code></td>
+<td>自分が理解できる形で説明してほしい</td>
+</tr>
+<tr>
+<td><code>/recall</code></td>
+<td>過去の関連作業の文脈を取り戻したい</td>
+</tr>
+</tbody></table></div>
+<h3><code>/how</code>：実際の処理を辿る</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/how ログインしてからホーム画面が表示されるまでの流れを説明してください。
+認証、ユーザー情報の取得、画面表示の順序を知りたいです。
+</code></pre></div>
+<p>返ってくる説明では、入口と出口、その間のデータの流れに注目します。複雑な対象では複数の調査役に分担し、小さい問いなら必要なコードを直接読んで説明する定義です。</p>
+<h3><code>/why</code>：設計の理由を証拠から調べる</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/why 通知の再試行回数が5回なのはなぜですか。
+過去の不具合や設計上の理由があるか、履歴から調べてください。
+</code></pre></div>
+<p>Git履歴や、接続されているIssue管理、設計資料、チャットなどを手がかりにします。ただし、pstackを追加しただけでSlackやNotionの情報を読めるわけではありません。利用できる連携と権限の範囲で調査します。</p>
+<p>理由を記録した資料が見つからなければ、「理由は確認できない」も有用な結果です。もっともらしい経緯を作って埋めるより、事実と推測が分かれているほうが、次の判断に使えます。</p>
+<h3><code>/teach</code>：設計判断を自分の言葉にする</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/teach 今回、キャッシュを追加せずにクエリを変更した理由を説明してください。
+両案の違いと、採用案が今回の問題を解決すると言える根拠を知りたいです。
+</code></pre></div>
+<p>要約だけではわからないときに使います。実装の仕組みと理由を組み合わせ、人間が判断できる説明にするためのスキルです。</p>
+<h3><code>/recall</code>：昨日の続きを始める</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/recall 先週のCSVインポート改善について、決まったこと、残った問題、次の作業を整理してください。
+</code></pre></div>
+<p>これは、アクセスできる過去の会話と共有記録から文脈を回収するものです。全アプリ、全アカウントの履歴を自動的に共有する仕組みではありません。</p>
+<p>特定のブランチ上の作業を引き継ぐなら、履歴の検索に加えて現在の状態も確認させます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このブランチの作業を引き継いでください。
+引き継ぎメモ、判断ログ、差分を読み、完了済みと未完了を分けてください。
+以前の「検証済み」という報告が今のコードにも当てはまるか確認してから続けてください。
+</code></pre></div>
+<p>これがSession pickupの使い方です。過去の説明を読み直すだけでなく、今のコードに照らして再開地点を決めます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/03-understand.md">理解と引き継ぎの公式ガイド</a></p>
+<h2 id="chapter-09">9. 大きな変更は、設計を実物で比較する</h2>
+<p>小さなオプション追加と、認証方式の変更では、必要な設計の深さが違います。pstackには、後から戻しにくい判断に時間を使うための仕組みがあります。</p>
+<h3><code>/architect</code>：使う側のコードから考える</h3>
+<p>新しい内部ライブラリやサービス境界を設計するとき、実装の都合から始めると、利用側が複雑になりがちです。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/architect with checkpoint.
+複数の画面から使うCSVインポート機能を設計してください。
+利用側がどう呼び出すかを先に示し、そのあと型とモジュールの境界を提案してください。
+既存の実装を確認し、設計案を見せたところで止まってください。
+</code></pre></div>
+<p>このように、まず呼び出し側の使い方を見れば、「このAPIは本当にわかりやすいか」を実装前に判断できます。</p>
+<p>設計書だけでは決まらない問題は、小さな試作品で測ります。たとえば、二つの検索方式の応答時間や、テーブルとカードのどちらが一覧を見やすいかは、動くものを比べるほうが早い場合があります。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/architect/SKILL.md">architectの定義</a></p>
+<h3><code>/arena</code>：同じ課題を、複数の独立した案で解く</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/arena CSVインポートのエラー表示を3案比較してください。
+同じ不正データを使い、利用者が直すべき行を特定できるか評価してください。
+各案は独立した場所に作り、比較結果と推奨案を示してください。
+今回は試作の比較までで、本体への取り込みはしないでください。
+</code></pre></div>
+<p>Arenaでは複数の担当に同じ課題を渡し、独立した候補を作ります。そのあと別の評価役と調整役が比較し、必要なら良い部分を組み合わせます。</p>
+<p>多数決で勝った案が必ず正しいわけではありません。「同じ入力に対してどう動いたか」「何が複雑になるか」という評価基準が必要です。違うモデル系列の評価役を使えるかどうかも、モデル設定に依存します。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/arena/SKILL.md">arenaの定義</a></p>
+<h3><code>/swarm</code>：違う範囲を分担して調べる</h3>
+<p>Arenaと似て見えますが、目的が違います。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/swarm packages/ 配下の各パッケージを調べてください。
+1担当につき1パッケージで、READMEの起動手順が実際に通るか確認します。
+製品コードは変更せず、結果を一つの表にまとめてください。
+</code></pre></div>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>Arena</th>
+<th>Swarm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>渡す仕事</td>
+<td>同じ課題を複数の担当へ</td>
+<td>異なる範囲や検証条件を分担</td>
+</tr>
+<tr>
+<td>欲しい成果</td>
+<td>比較して選び、統合した案</td>
+<td>各範囲の結果を集約した報告</td>
+</tr>
+<tr>
+<td>向いている例</td>
+<td>API設計を3案比較</td>
+<td>10パッケージの起動確認</td>
+</tr>
+</tbody></table></div>
+<p>Swarmには条件を宣言した競争実行もありますが、初心者は「調べる範囲を分ける道具」と覚えると使い分けやすいでしょう。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/swarm/SKILL.md">swarmの定義</a></p>
+<h3><code>/interrogate</code>：別の視点から変更を疑う</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/interrogate このブランチの変更をレビューしてください。
+実際の不具合、既存動作の退行、データの不整合を優先してください。
+まず指摘と根拠を示し、コードは変更しないでください。
+</code></pre></div>
+<p>Interrogateは複数のレビュー結果をまとめ、対処すべきもの、検討するもの、参考情報、棄却するものに分類します。指摘された数をそのまま品質スコアにしないことが重要です。</p>
+<p>たとえば「この条件で二重保存になる」という指摘は、該当する実行経路で再現できるか確認します。「念のためチェックを増やすべき」という指摘は、既存の境界で保証済みかもしれません。</p>
+<p>指摘をすべて受け入れるのではなく、<strong>採用・棄却のどちらにも理由を持つ</strong>ためのレビューです。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/interrogate/SKILL.md">interrogateの定義</a></p>
+<h2 id="chapter-10">10. 不具合修正と性能改善で、頼み方を変える</h2>
+<h3>不具合は「再現した条件」を最後まで持ち続ける</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 設定を保存してすぐ再読み込みすると、変更が消えることがあります。
+まず実際の画面で再現し、操作順と保存結果を記録してください。
+原因を絞り込んでから修正し、同じ操作で保存が維持されることを確認してください。
+</code></pre></div>
+<p>最初に再現した操作と、修正後の確認操作が違うと、直ったかどうか判断できません。エラーが消えたとしても、保存自体をしなくなっただけかもしれません。</p>
+<p>安価に自動テストを書ける問題なら、修正前に失敗し、修正後に通るテストを残します。pstackには <code>/tdd</code> もあります。ただし、巨大なモックを作って現実から離れたテストを増やすより、利用者と同じ経路で確認するほうが適切なケースもあります。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/bug-fix.md">不具合修正プレイブック</a></p>
+<p>再現できなかった場合は、そのまま「修正済み」と扱わないでください。試した条件、観測できたこと、残った条件を報告させます。</p>
+<h3>性能は「速くなった気がする」から離れる</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 一覧の初回表示を改善してください。
+まず現在の処理時間とトレースを取り、時間を使っている箇所を特定してください。
+同じデータ量、同じ環境、同じ操作で変更前後を比較してください。
+速くならなかった変更は残さず、採用した変更と測定結果を示してください。
+</code></pre></div>
+<p>ここでのトレースは、どの処理にどれだけ時間がかかったかを記録したものです。エージェントにコードを読ませて推測だけで最適化させるのではなく、計測から仮説を作ります。</p>
+<p>測定値には、対象の操作、入力データ、単位を添えます。開発モードと本番ビルド、初回とキャッシュ済みの読み込みを混ぜて比較してはいけません。</p>
+<p>一つの数値を継続的に改善したい場合は、Hillclimbのプレイブックもあります。「一定の入力で処理時間を目標以内へ縮める」のように、測れる目標を渡します。試行を重ねても結果が伸びないときに、成功条件をこっそり緩めないことが大切です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/perf-issue.md">性能改善プレイブック</a>・<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/hillclimb.md">Hillclimb</a></p>
+<h2 id="chapter-11">11. PRを作る、マージ可能にする、マージする</h2>
+<p>本格運用では、この三つを区別してください。</p>
+<p>PRはPull Requestの略です。ブランチ上の変更を、ほかの人が確認し、取り込める形で提示するものです。マージは、その変更を取り込む操作です。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">変更と検証
+    ↓
+PRを作成
+    ↓
+レビュー・CI・取り込み条件を確認
+    ↓
+マージ可能な状態
+    ↓
+マージ
+    ↓
+プロジェクトの配備手順と、本番での確認
+</code></pre></div>
+<h3>PRを作る</h3>
+<p>練習用のローカルプロジェクトと違い、PRを作るには対象のリモートリポジトリと、操作できる認証環境が必要です。GitHubの場合、公式プレイブックの基本経路はGitHub CLIの <code>gh</code> です。Origin CLIがあり対象を解決できる場合は、そちらを使う定義もあります。</p>
+<p>最初に、対象を確認させます。</p>
+<p>GitHub CLIをまだ用意していない場合は、<a href="https://cli.github.com/">公式の導入案内</a> に沿ってインストールします。次に、ターミナルでログインします。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">gh auth login
+</code></pre></div>
+<p>作業対象のリポジトリで、次を実行します。</p>
+<div class="code-block"><div class="code-toolbar"><span>ターミナルで実行</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-sh">git remote -v
+gh repo view --json nameWithOwner,defaultBranchRef
+</code></pre></div>
+<p>表示された所有者・リポジトリ名と取り込み先を確認します。ログインできても、そのリポジトリを操作する権限があるとは限りません。権限エラーが出る場合は、対象を操作できるアカウントや連携設定を先に整えます。教材のようにリモートを登録していないローカルリポジトリでは、ここから先のPR操作はまだ行えません。<a href="https://cli.github.com/manual/gh_auth_login">GitHub CLIの認証手順</a></p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode この変更をPRにする前に、対象リポジトリ、現在のブランチ、
+取り込み先ブランチ、含まれる差分、認証状態を確認してください。
+まだpushやPR作成はせず、確認結果を示してください。
+</code></pre></div>
+<p>対象が正しいことを確認できたら、作成を依頼します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 確認した変更をPRにしてください。
+小さく順序のわかるcommitに整理し、何を変え、どう動作確認したかを本文に書いてください。
+レビュー可能な通常PRとして作成し、マージはしないでください。
+</code></pre></div>
+<p>現在のOpening a PRプレイブックは、通常のレビュー可能なPRを作り、PRを開いただけでBabysitを始めない定義です。本文では目的、影響、トレードオフ、検証結果を簡潔に示します。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/opening-a-pr.md">PR作成プレイブック</a></p>
+<h3>Babysitでマージ可能な状態にする</h3>
+<p>CIとは、リポジトリ側で自動実行されるテストやビルドなどです。PRを作ったあと、CIが失敗したりレビューが追加されたりするので、その追従を依頼します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このPRをbabysitしてください。
+レビューの指摘とCIを確認し、必要な修正をしてマージ可能な状態にしてください。
+マージと自動マージの設定は行わないでください。
+</code></pre></div>
+<p>現在のBabysitには、通常の追従、背景での対応、レビューコメントのみ、状態確認のみというモードがあります。単に現状を知りたいときは、軽く頼めます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このPRの状態だけ確認してください。
+残っている指摘、CI、マージを妨げる条件を報告し、変更はしないでください。
+</code></pre></div>
+<p><strong>Babysitはマージを行いません。</strong> また、現行定義ではスタックの付け替えやrebaseを自分で行わず、競合があれば所有者側の調整が必要だと報告します。一般的な「CIが緑になるまで何でも直すツール」という説明より、役割が厳密です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/babysit.md">Babysitの定義</a></p>
+<h3>Shippingで、独立した検証を経てマージする</h3>
+<p>実際に取り込む場合は、対象を特定して依頼します。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 確認済みのこのPRをshipしてください。
+変更を書いた担当とは別の担当が実際の挙動を検証し、
+その検証が現在の差分に対応していることを確認してからマージしてください。
+</code></pre></div>
+<p>現行のShippingは、PRごとに独立したCursor cloud agentが実際の挙動を確認し、その結果に基づいてマージする手順です。Cloud Agentsを使える環境や、対象を実行・操作できる仕組みが前提になります。</p>
+<p>ここまで未設定の場合は、「Shippingを呼べば全部揃う」と考えず、まずクラウド側で検証が成立するよう準備します。クラウドを使わない運用なら、PRをマージ可能にしたあと、人間が自分の検証と取り込み手順で扱う選択もできます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/shipping.md">Shippingの定義</a></p>
+<h3>依存するPRは、下から順に扱う</h3>
+<p>たとえば次の関係を考えます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">main
+  └─ PR A：データ構造を追加
+       └─ PR B：そのデータを使うAPI
+            └─ PR C：APIを使う画面
+</code></pre></div>
+<p>これがPRのスタックです。Cだけ確認済みでも、その前提であるBが未検証なら、Cまで取り込んでよいとは言えません。</p>
+<p>Shippingは、最下段から連続して検証済みの範囲だけを対象にします。また、検証後に差分が変わったら、古い検証結果をそのまま使わないよう確認します。</p>
+<p>初心者の段階では、まず独立した一つのPRを最後まで進めてから、スタックへ広げると理解しやすくなります。</p>
+<h3>マージ済みと、本番で動作確認済みは別</h3>
+<p>PRがマージされても、配備が失敗したり、本番の環境変数が不足したりすることがあります。</p>
+<p>pstackのShippingを、本番監視サービスや汎用の配備設定ツールとして扱わないでください。自分のプロジェクトのCI/CDと配備手順に合わせて、マージ後の確認を定めます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 今回のマージが本番へ反映されたか確認してください。
+対象の配備と実行中の版を照合し、テスト用アカウントで変更した経路を確認してください。
+配備成功と、アプリの動作確認を分けて報告してください。
+本番データを書き換える操作は、実行前に対象と影響を示してください。
+</code></pre></div>
+<p>「マージ済み」「配備済み」「本番の対象機能を確認済み」の三つを区別すると、作業完了の判断が明確になります。</p>
+<h2 id="chapter-12">12. 長時間任せるときは、終わり方を先に決める</h2>
+<p>一件の修正を任せられるようになったら、夜間の移行作業などにも使えます。ただし、「4時間頑張って」では、何をもって成功とするか決まりません。</p>
+<p>長時間の依頼には、次を含めます。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目的</td>
+<td>古いパーサーの呼び出しを新APIへ移す</td>
+</tr>
+<tr>
+<td>完了条件</td>
+<td>古い呼び出し0件、保存済み入力の検証成功、旧API削除</td>
+</tr>
+<tr>
+<td>作業場所</td>
+<td>指定した基準ブランチからの独立したworktree</td>
+</tr>
+<tr>
+<td>許可範囲</td>
+<td>commit・push・通常PR作成まで。マージはしない</td>
+</tr>
+<tr>
+<td>記録</td>
+<td>判断、根拠、証拠、結果をログに残す</td>
+</tr>
+<tr>
+<td>打ち切り条件</td>
+<td>指定時刻や予算の上限。解消できない外部要因</td>
+</tr>
+</tbody></table></div>
+<p>worktreeは、同じGitリポジトリの履歴を使いながら、別の作業フォルダを持つ仕組みです。複数の作業が同じファイルを同時に書き換えるのを避けるために使います。</p>
+<h3>夜間作業のプロンプト例</h3>
+<p>次の角括弧部分は、実在する名前や条件へ置き換えます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode これから離席します。
+［基準ブランチ］から作る独立したworktreeで、
+［旧API］の全呼び出しを［新API］へ移行してください。
+
+完了条件は、旧APIの呼び出しが0件、既存の入力例がすべて通ること、旧APIが削除されることです。
+小さな単位ごとに実行・検証し、判断と根拠を記録してください。
+commit、push、通常PR作成までは許可します。マージ、本番配備、データ削除は行わないでください。
+
+利用できる /loop の仕組みで完了条件を再確認しながら進めてください。
+上限は［終了時刻・タイムゾーン］と、利用環境で設定した予算です。
+解消できない認証や環境の問題があれば、何が足りないかと再開手順を残してください。
+条件を緩めて完了扱いにしないでください。
+</code></pre></div>
+<p><code>/loop</code> はpstackに同梱されるスキルではなく、Cursor側の継続実行の仕組みです。使用環境で使えること、実際に待機・再開が設定されたことを確認します。上限金額についても、文章で伝えるだけでなく、利用環境側の支出上限を設定します。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/07-overnight.md">長時間実行のガイド</a>・<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/autonomous-run.md">Autonomous run</a></p>
+<h3>判断ログを読む</h3>
+<p><code>/show-me-your-work</code> は、長時間作業をあとから監査するためのスキルです。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/show-me-your-work 離席中の作業を説明してください。
+何を採用し、何を捨て、どの証拠で判断したかを知りたいです。
+</code></pre></div>
+<p>ログはTSV、つまりタブ区切りの表です。標準では <code>decisions.tsv</code> などに、時刻、段階、判断、理由、証拠への参照、結果を記録します。</p>
+<p>次は説明用の一行です。実行記録ではありません。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>判断</th>
+<th>理由</th>
+<th>証拠</th>
+<th>結果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>キャッシュ追加案を取り下げた</td>
+<td>同条件で速くならなかった</td>
+<td>比較トレースへのパス</td>
+<td>変更を撤回</td>
+</tr>
+</tbody></table></div>
+<p>こうした記録なら、採用案だけでなく、遠回りした理由も追えます。ログは標準ではローカルの作業成果で、常にcommitするものではありません。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/show-me-your-work/SKILL.md">判断ログの定義</a></p>
+<h3>止めるとき、再開するとき</h3>
+<p>単にウィンドウを閉じる前に、作業を止める依頼をします。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode 安全に一時停止してください。
+新しい作業は始めず、起動したサブエージェントを止め、再開できる状態を残してください。
+完了したこと、未検証のこと、ブランチ、証拠、次の一手を引き継ぎメモに書いてください。
+</code></pre></div>
+<p>Pause safelyは、作業を保存し、次の担当が再開できる地点を残す手順です。停止のために作業中の変更をcommitすることがあります。どのcommitを作ったかも確認します。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/pause-safely.md">停止プレイブック</a></p>
+<h2 id="chapter-13">13. 複数エージェントとCloud Agentsへ広げる</h2>
+<p>並列化する前に、まず一体が自分の変更を確実に検証できる状態を作ります。起動方法が不明なエージェントを10体に増やしても、調査の重複が10倍になるだけです。</p>
+<h3>並列化では、ファイル以外の共有状態も分ける</h3>
+<p>別ブランチにしただけでは、同じ開発用データベースを書き換える可能性があります。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>共有すると衝突しやすいもの</th>
+<th>分け方の例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ソースの作業フォルダ</td>
+<td>worktreeを分ける</td>
+</tr>
+<tr>
+<td>開発サーバー</td>
+<td>ポートを分ける</td>
+</tr>
+<tr>
+<td>データベース</td>
+<td>テスト用DB・スキーマ・データを分ける</td>
+</tr>
+<tr>
+<td>ブラウザ</td>
+<td>プロファイルやセッションを分ける</td>
+</tr>
+<tr>
+<td>出力ファイル</td>
+<td>担当・試行ごとの保存先を使う</td>
+</tr>
+</tbody></table></div>
+<p>複数人が同じアプリ画面を同時に操作すると、片方が開いた画面を別の担当が閉じることもあります。独立した環境を用意できない場合は、操作を一人にまとめます。</p>
+<h3>ローカルのworktreeとCloud Agentsを使い分ける</h3>
+<p>Lauren Tanの解説では大規模な並列化にCloud Agentsを推しています。一方、現在の公式ガイドにはローカルworktreeの活用も書かれています。「worktreeは常に禁止」と一般化する必要はありません。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>向いている状況</th>
+<th>事前に確認すること</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ローカルworktree</td>
+<td>手元で動くアプリ、少数の並行作業</td>
+<td>CPU・メモリ・ディスク、ポートやデータの分離</td>
+</tr>
+<tr>
+<td>Cloud Agents</td>
+<td>手元のPCに依存させない作業、複数の独立した実行環境</td>
+<td>リポジトリ接続、起動環境、秘密情報、外部接続、利用費用</td>
+</tr>
+</tbody></table></div>
+<p>Cloud Agentsはクラウドの独立したVMで開発環境を動かします。手元のPCがインターネットにつながっていなくても進められる一方、手元にしかないアプリや認証、ファイルへそのままアクセスできるわけではありません。<a href="https://cursor.com/docs/cloud-agent">CursorのCloud Agents</a></p>
+<h3>クラウドでの最初の一件</h3>
+<p>次の順序で整えると、どこが足りないかを切り分けやすくなります。</p>
+<ol>
+<li>Cursor側でソース管理との接続と対象リポジトリの権限を確認する。</li>
+<li>Cloud Agent用の環境を設定し、依存関係を入れてアプリを起動できるようにする。</li>
+<li>開発・検証に必要な秘密情報を、指定されたSecretsの仕組みで渡す。</li>
+<li>pstackとプロジェクトの検証スキルが、クラウド側でも利用できるか確認する。</li>
+<li>まず小さな一件で起動、操作、証拠保存まで試す。</li>
+</ol>
+<p>環境設定にはエージェントによるセットアップ、スナップショット、<code>.cursor/environment.json</code> でのDockerfile指定などの経路があります。具体的な設定は、<a href="https://cursor.com/docs/cloud-agent/setup">Cloud Environment Setup</a> に従ってください。</p>
+<p>手元の <code>~/.cursor/rules/pstack-models.mdc</code> が、そのままクラウドへコピーされるとは仮定しないでください。クラウド側で見えるモデルと設定を確認します。プロジェクトに置いた検証スキルも、commit・pushされていなければ新しいクラウド環境には届きません。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode このクラウド環境で、アプリの起動と検証手順が成立するか確認してください。
+製品コードは変更せず、現在の検証スキルに従って一つの機能を操作してください。
+使った環境、実行コマンド、結果、保存した証拠を示してください。
+手元だけにある設定が必要なら、その不足を明示してください。
+</code></pre></div>
+<h3>一晩に複数の仕事を任せる三つの方法</h3>
+<p>現在のpstackには、規模に応じたプレイブックがあります。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>使いどころ</th>
+<th>マージの扱い</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Autopilot-stack</td>
+<td>関係する変更を一本のPRチェーンに揃え、人間が確認したい</td>
+<td>スタックを準備し、マージしない</td>
+</tr>
+<tr>
+<td>Autopilot-full</td>
+<td>独立した変更群を、それぞれ完了まで進めたい</td>
+<td>明示された権限と独立検証の条件でマージまで進む</td>
+</tr>
+<tr>
+<td>Orchestrate</td>
+<td>数日規模で複数の作業を継続管理したい</td>
+<td>調整役がプログラム全体を管理する</td>
+</tr>
+</tbody></table></div>
+<p>これらは単に <code>/swarm</code> で数人に分けるより重い仕組みです。担当、PR、検証結果、進行状況を追跡します。一件の作業で済むなら、まず前章の長時間実行で十分です。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/autopilot-stack.md">Autopilot-stack</a>・<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/autopilot-full.md">Autopilot-full</a>・<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/orchestrate.md">Orchestrate</a></p>
+<p>実行方法を理解する段階では、次のように<strong>方針の提示だけ</strong>を依頼できます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode この三つの変更をautopilot-stackで進める場合の方針を示してください。
+各変更の依存関係、担当、検証方法、最終的なPRチェーンを説明してください。
+今は方針の提示だけで、実行開始は私のGOを待ってください。
+</code></pre></div>
+<p>これで、どこまで任せるのかを具体的に判断できます。</p>
+<h2 id="chapter-14">14. 繰り返しの失敗を、次の仕組みに変える</h2>
+<p>同じ注意を毎回書くようになったら、作業手順を改善する時期です。</p>
+<h3><code>/reflect</code>：今回の教訓を残す</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/reflect 今回、テストアカウントの準備に時間がかかりました。
+原因と、次回同じところで止まらないための改善案をまとめてください。
+ルールを増やすだけでなく、起動確認や準備スクリプトで解決できるか検討してください。
+</code></pre></div>
+<p>pstackの <code>/reflect</code> は、単なる週報生成ではありません。作業を振り返り、今後のスキル改善につながる提案を作ります。現在の公式ガイドでは、提案を整理し、スキルを変更する前に承認を待つ流れです。</p>
+<p>一度だけ起きた珍しい問題を、すべての作業で必須の手順にしないことも大切です。「次の意思決定を本当に良くするか」で選びます。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/09-make-it-yours.md">自分の運用へ適応するガイド</a></p>
+<h3><code>/automate-me</code>：自分の仕事の進め方をモードにする</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/automate-me
+</code></pre></div>
+<p>これは、現在のワークスペースで参照できる過去の作業から、繰り返される好みや手順を抽出し、自分用のモードを作るためのスキルです。</p>
+<p>たとえば「説明は日本語」「性能改善では必ず前後の数値を比較」「取り込み前に一度確認」といった傾向です。pstackを基礎として使いながら、自分向けの入口を追加できます。</p>
+<p>最初から行うより、いくつかの仕事を終え、自分の好みが履歴に表れてからのほうが判断しやすくなります。提案されたルールが、偶然の一回の依頼なのか、長く使いたい方針なのかは、自分でも確認してください。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/automate-me/SKILL.md">automate-meの定義</a></p>
+<h3>文章を整えたいとき</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/technical-writing このREADMEを、初めて触る開発者向けのチュートリアルとして直してください。
+導入して一つ動かすまでに必要な説明を優先してください。
+</code></pre></div>
+<p><code>/technical-writing</code> は、チュートリアル、目的別手順、リファレンス、背景説明などの文書の役割を分け、読者が迷わない文章にするスキルです。文体を簡潔に整える <code>/unslop</code> もあります。</p>
+<p>「詳しい文章」より「この読者が次の操作に進める文章」を求めると、レビューしやすくなります。<a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/09-make-it-yours.md">文章とスキル改善のガイド</a></p>
+<h2 id="chapter-15">15. 毎日の運用に落とし込む</h2>
+<p>ここまでの機能を全部毎日使う必要はありません。普段の仕事には、次の流れを出発点にできます。これは公式の必須日課ではなく、本記事の運用例です。</p>
+<h3>作業開始時</h3>
+<p>昨日からの続きなら、<code>/recall</code> で文脈を戻し、ブランチと未完了事項を確認します。新規作業なら <code>/poteto-mode</code> に目的、制約、完了条件を渡します。</p>
+<h3>実装中</h3>
+<p>変更前の症状や出力を記録します。設計で迷う場合は試作や <code>/architect</code> を使い、小さな単位で変更と検証を繰り返します。</p>
+<h3>完了前</h3>
+<p>実際の利用経路を確認します。影響の大きい変更なら <code>/interrogate</code> や <code>/blast-radius</code> で、隣接する経路への影響を調べます。PRを作る場合は、検証結果を本文に残します。</p>
+<h3>作業後</h3>
+<p>繰り返しそうな遠回りがあれば <code>/reflect</code>。アプリの画面や操作が変わったなら、検証スキルとFeature Mapの更新も確認します。</p>
+<h3>進歩は何で測るか</h3>
+<p>PR数だけでは、仕事が良くなったか判断できません。次のような指標を、自分の課題に合わせて選びます。</p>
+<ul>
+<li>問題を報告してから、再現できるまでの時間。</li>
+<li>PRを作ってから、必要な修正が終わるまでの時間。</li>
+<li>AIの作業後に、人間がやり直した回数。</li>
+<li>検証できずに終わった作業の割合。</li>
+<li>利用者に影響する不具合や手戻り。</li>
+<li>一件の完了に使った費用。</li>
+</ul>
+<p>最初は一、二個で十分です。「AIが長く動いた」より、「同じ品質の仕事を、少ない手戻りで終えられた」を確認しましょう。</p>
+<h2 id="chapter-16">16. よくあるつまずきと対処</h2>
+<h3>コマンドが候補に出ない</h3>
+<p>まず、操作しているのがCursorのチャットであること、pstackが追加されていることを確認します。次に、新しいチャットで再確認します。</p>
+<p><code>/deslop</code> や <code>control-ui</code> は <code>cursor-team-kit</code> 側の機能です。生成された検証スキルは、実際の <code>name</code> を確認してください。別プロジェクトのpstackの記事からコマンドを混ぜていないかも見直します。</p>
+<h3>モデルが起動しない</h3>
+<p><code>/setup-pstack</code> を再実行し、現在使えるモデルだけで設定し直します。ブログや古い設定ファイルに載っているモデル名が、自分のアカウントでも使えるとは限りません。</p>
+<h3>「検証済み」と言うが、証拠がない</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">実際に実行したコマンドか操作と、その結果を示してください。
+未実行の確認は未実行と分けてください。
+保存した証拠が現在も読めるか確認してください。
+</code></pre></div>
+<p>スクリーンショットがある場合も、対象の画面か、操作の結果が写っているかを確認します。保存されたことの証明に、保存前の画面だけを使わないようにします。</p>
+<h3>調査だけ頼んだのに、修正へ進む</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">目的は調査です。修正はまだ依頼していません。
+今わかった事実、推測、追加で必要な観測を分けて、変更せずに報告してください。
+</code></pre></div>
+<p>前の作業から話題を変える場合は、<code>new task</code> も添えます。</p>
+<h3>設計の議論が長く、判断がつかない</h3>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">未解決の問いを一つ選び、判断できる最小の試作品か測定を行ってください。
+結果を見てから設計を決めたいです。
+</code></pre></div>
+<p>たとえば「大量データで重いかもしれない」なら、対象量のデータで測ります。実験で決まる問題を、文章だけで延々と検討しないための切り替えです。</p>
+<h3>並列作業でファイルや状態がぶつかる</h3>
+<p>作業フォルダだけでなく、DB、ポート、ブラウザ、出力先を確認します。分離できないものは一人に操作をまとめます。「もう少し注意して」より、共有状態を減らすほうが再発を防げます。</p>
+<h3>PRが緑なのにBabysitが完了しない</h3>
+<p>テスト結果の一覧以外に、取り込み先との競合、未解決のレビュー、必須承認などが残っていないか確認します。現在のBabysitは、単なる緑のチェック一覧ではなく、利用しているホスト側のマージ可能性を見ます。</p>
+<h3>本番へ出すつもりがない</h3>
+<p>作業の最初に「ローカルの修正まで」「通常PRの作成まで」「マージ可能にするまで」と明記します。<code>ship</code>、<code>land</code>、<code>merge</code> は、取り込みを依頼する言葉として区別します。</p>
+<h3>動画がほしいのに、取れない</h3>
+<p>対象の環境に録画可能な操作ツールが必要です。動画を生成できない場合、取れたふりをさせず、何が足りないかを示してもらいます。CLIの変更なら、動画より実行ログと終了コード、出力ファイルの内容のほうが適切な証拠になることもあります。</p>
+<h3>更新後に挙動が変わった</h3>
+<p>利用中のプラグイン版、モデル設定、補助プラグインの有無を記録します。更新後は、本番作業の前に、小さな既知のタスクでスキル認識と検証経路を試します。コマンド名や手順に迷ったら、利用中の版の <code>SKILL.md</code> を確認します。</p>
+<p>公式サイトの <code>main</code> は変化します。本記事の参照先は、再確認できるよう主要部分を調査時のコミットへ固定しています。</p>
+<h2 id="chapter-17">17. コマンド早見表</h2>
+<p>最初は上から六つ程度で十分です。困ったときに、目的から選んでください。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>したいこと</th>
+<th>入り口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>普段の調査・実装・修正</td>
+<td><code>/poteto-mode</code></td>
+</tr>
+<tr>
+<td>利用モデルを設定する</td>
+<td><code>/setup-pstack</code></td>
+</tr>
+<tr>
+<td>動きを理解する</td>
+<td><code>/how</code></td>
+</tr>
+<tr>
+<td>理由や経緯を調べる</td>
+<td><code>/why</code></td>
+</tr>
+<tr>
+<td>わかるまで説明してもらう</td>
+<td><code>/teach</code></td>
+</tr>
+<tr>
+<td>実動作の検証手順を作る</td>
+<td><code>/create-verification-skill</code></td>
+</tr>
+<tr>
+<td>検証手順を更新する</td>
+<td><code>/maintain-verification-skill</code></td>
+</tr>
+<tr>
+<td>関連する過去の作業を取り戻す</td>
+<td><code>/recall</code></td>
+</tr>
+<tr>
+<td>影響範囲を実証する</td>
+<td><code>/blast-radius</code></td>
+</tr>
+<tr>
+<td>APIやモジュール境界を設計する</td>
+<td><code>/architect</code></td>
+</tr>
+<tr>
+<td>同じ課題の複数案を比べる</td>
+<td><code>/arena</code></td>
+</tr>
+<tr>
+<td>複数の範囲を分担して確認する</td>
+<td><code>/swarm</code></td>
+</tr>
+<tr>
+<td>複数の視点でレビューする</td>
+<td><code>/interrogate</code></td>
+</tr>
+<tr>
+<td>失敗するテストから修正する</td>
+<td><code>/tdd</code></td>
+</tr>
+<tr>
+<td>判断の記録を残す</td>
+<td><code>/show-me-your-work</code></td>
+</tr>
+<tr>
+<td>作業から教訓を抽出する</td>
+<td><code>/reflect</code></td>
+</tr>
+<tr>
+<td>自分用のモードを作る</td>
+<td><code>/automate-me</code></td>
+</tr>
+<tr>
+<td>文書の構成と説明を整える</td>
+<td><code>/technical-writing</code></td>
+</tr>
+<tr>
+<td>文章の冗長さや癖を除く</td>
+<td><code>/unslop</code></td>
+</tr>
+<tr>
+<td>直前の説明を平易に言い直す</td>
+<td><code>/bro</code></td>
+</tr>
+</tbody></table></div>
+<p>PRの監視、Shipping、Prototype、Autopilotは、基本的に <code>/poteto-mode</code> へ目的を伝えて該当プレイブックを使う形です。ここにない <code>/ship</code> や <code>/plan</code> を、pstackに当然ある独立スキルとして想定しないでください。<a href="https://github.com/cursor/plugins/tree/main/pstack#readme">公式スキル一覧</a></p>
+<h2 id="chapter-18">18. 最初の一週間の進め方</h2>
+<p>以下は学習順序の提案です。短期間で全部を有効化する必要はありません。</p>
+<div class="table-scroll" role="region" aria-label="比較表" tabindex="0"><table>
+<thead>
+<tr>
+<th>段階</th>
+<th>やること</th>
+<th>進める目安</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初日</td>
+<td>導入し、教材のJSON出力を追加する</td>
+<td>実行結果と差分を自分で確認できる</td>
+</tr>
+<tr>
+<td>次の作業</td>
+<td>実プロジェクトを <code>/how</code> で調べる</td>
+<td>起動方法と主要な利用経路がわかる</td>
+</tr>
+<tr>
+<td>その次</td>
+<td>検証スキルを生成する</td>
+<td>一つの機能を操作し、証拠が残る</td>
+</tr>
+<tr>
+<td>小さな改修</td>
+<td>修正、検証、通常PR作成まで進む</td>
+<td>PR本文から何を確かめたか追える</td>
+</tr>
+<tr>
+<td>運用を拡大</td>
+<td>Babysitや短い無人実行を試す</td>
+<td>停止・再開、費用、完了条件を管理できる</td>
+</tr>
+<tr>
+<td>必要になってから</td>
+<td>Cloud Agentsと並列化を使う</td>
+<td>各担当が独立した環境で検証できる</td>
+</tr>
+</tbody></table></div>
+<p>最後に、明日から使う依頼の形をもう一度載せます。</p>
+<div class="code-block"><div class="code-toolbar"><span>入力・表示例</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode ［実現したいこと］を進めてください。
+［変更してはいけないこと］を守ってください。
+［実際の操作や出力］で完了を確認し、証拠を示してください。
+今回は［ローカル修正／PR作成／マージ可能化／マージ］までお願いします。
+</code></pre></div>
+<p>pstackを使いこなす最初の一歩は、長い指示を覚えることではありません。小さな仕事に、確かめられる終わりを与えることです。そこで得た起動手順、操作方法、検証の証拠を次の仕事でも使える形に残していくと、任せられる範囲が少しずつ広がります。</p>
+<h2 id="chapter-19">付録：この記事の対象と、確認した範囲</h2>
+<p>この記事は、Lauren Tanの解説を収めた提供HTMLを参考にしつつ、公開されている公式リポジトリのREADME、ガイド、個別スキル、プレイブックを照合して構成した独自の入門記事です。解説記事の翻訳を再掲載したものではありません。</p>
+<p>添付記事の「月間PR数」「生産性の倍率」は、本記事の利用効果を保証する数値としては扱っていません。また、添付記事に登場するDr Eggbotを、本記事で確認した公開プラグインの標準同梱物としては案内していません。公開版で確認できたサブエージェントには <code>poteto-agent</code> と <code>Comment Sicko</code> があります。<a href="https://github.com/cursor/plugins/tree/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/agents">公開エージェント定義</a></p>
+<p><strong>実行して確認したもの</strong>は、付属教材の変更前のCLIと既存テストです。pstackをユーザーのCursorへ実際にインストールして一連のエージェント操作を実行したわけではありません。PR作成、クラウド実行、マージ、本番配備も、本記事作成のためには行っていません。本文のプロンプトとJSON出力例は、利用時に試すための手順・仕様です。</p>
+<h3>主要な参照先</h3>
+<ul>
+<li><a href="https://github.com/cursor/plugins/tree/main/pstack#readme">公式READMEと配布元</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/.cursor-plugin/plugin.json">確認した0.15.2のプラグイン定義</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/01-setup.md">公式ガイド：セットアップ</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/06-verify-and-ship.md">公式ガイド：実動作の検証とPR</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/create-verification-skill/SKILL.md">検証スキルの生成定義</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/maintain-verification-skill/SKILL.md">検証スキルの保守定義</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/babysit.md">Babysitプレイブック</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/skills/poteto-mode/playbooks/shipping.md">Shippingプレイブック</a></li>
+<li><a href="https://github.com/cursor/plugins/blob/889ec4b68fa5aab0e867dad71ec3fdf386ae48f3/pstack/docs/guide/07-overnight.md">公式ガイド：長時間実行</a></li>
+<li><a href="https://cursor.com/docs/cloud-agent">Cursor：Cloud Agents</a></li>
+</ul>
+<p>実装の詳細は、本文中のリンクから該当ファイルへ辿れます。固定した参照と最新版に差がある場合、運用する環境の版を確認して読み替えてください。</p>
+</article>
+<footer>pstackの公開資料に基づく独自の実践ガイドです。公式ドキュメントの翻訳・転載ではありません。<br>同梱教材は学習用です。公開操作を行わず、ローカルで最初の一周を試せます。<br><a href="#top">ページの先頭へ</a></footer>
+</main>
+</div>
+<p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+<script>
+document.querySelectorAll('.copy-button').forEach(button => {
+  button.addEventListener('click', async () => {
+    const code = button.closest('.code-block').querySelector('code');
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      button.textContent = 'コピーしました';
+      document.getElementById('copy-status').textContent = 'コードをコピーしました';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      button.textContent = '選択しました';
+      document.getElementById('copy-status').textContent = 'コードを選択しました。コピーのショートカットキーを使ってください';
+    }
+    setTimeout(() => {button.textContent = 'コピー';}, 2500);
+  });
+});
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      document.querySelectorAll('.desktop-toc a').forEach(link => {
+        if (link.hash === '#' + entry.target.id) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+  }, {rootMargin:'-5% 0px -70% 0px'});
+  document.querySelectorAll('article h2').forEach(heading => observer.observe(heading));
+}
+</script>
+</body>
+</html>
