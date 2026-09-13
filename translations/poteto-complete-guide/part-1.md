@@ -25,7 +25,7 @@ Grok @Bot の庭師であり保守者でいられたのは、pstack があった
 
 道具箱の中でいちばん重要なスキルは、高品質な検証スキルです。このスキルは持っておき、保守する価値がそれほど高いので、私は「ただのスキル」ではなく重要インフラだと思っています。よい検証スキルは、非エンジニアを含むチーム全体の成果を増幅します。うまくやれば、チーム全体の成果は 100 倍から 1000 倍になります。
 
-用語に馴染みがないなら、verification とは、エージェントが自分の作業を自分で確かめられることです。あなたがボトルネックにならずにループを閉じられるので、タスクが成功するまで進み続けられます。Cursor 向けに最初の検証スキルを作った経緯を知りたい人は、以前の投稿 Loops You Can Trust を見てください。
+用語に馴染みがないなら、verification とは、エージェントが自分の作業を自分で確かめられることです。あなたがボトルネックにならずにループを閉じられるので、タスクが成功するまで進み続けられます。Cursor 向けに最初の検証スキルを作った経緯を知りたい人は、以前の投稿 [Loops You Can Trust](https://x.com/poteto/status/1960731697265430855) を見てください。
 
 ## 検証スキルを一緒に作る
 
@@ -37,7 +37,7 @@ Dr Eggbot にエンジニアボットを作らせ、そのボットに `/create-
 
 私は、Grok @Bot と Cursor を作るときに使う検証スキルをすべて蒸留して、一種のメタスキルにしました。自分のアプリ向けに高品質な検証スキルを作る方法を、エージェントに教えます。
 
-ここで技術スタックの選択が重要になります。たとえば Electron や Web のアプリなら、JS 生態系の豊富なデバッグ道具を使えます。Chrome DevTools Protocol（CDP）なら、ブラウザの開発者ツールと同じ道具が使えます。iOS アプリならシミュレータを使います。
+ここで技術スタックの選択が重要になります。たとえば Electron や Web のアプリなら、JS 生態系の豊富なデバッグ道具を使えます。[Chrome DevTools Protocol（CDP）](https://chromedevtools.github.io/devtools-protocol/)なら、ブラウザの開発者ツールと同じ道具が使えます。iOS アプリならシミュレータを使います。
 
 理想は、手で開発するときと同じように、アプリを操作し、デバッグし、perf トレースを取り、その他のデバッグと開発の道具を使えることです。使える豊かなランタイムがなければ、エージェントに道具を作らせる必要があります。lldb を使う、開発環境で sidecar として動く独自パッケージを使う、などです。手元にあるものを使うだけでも構いません。
 
@@ -45,7 +45,7 @@ Dr Eggbot にエンジニアボットを作らせ、そのボットに `/create-
 
 ## 再現可能にする
 
-pstack には「Build the Lever」という原則があります。スキルを作る文脈では、エージェントには markdown だけではなく道具を渡す、という意味です。検証スキルでは、アプリの操作とデバッグをスクリプト化する、小さくてエージェント向きの CLI を作ります。何かをクリックするためだけの使い捨てスクリプトを書く代わりに CLI コマンドを実行するので、トークン消費が減り、検証スキルは再現しやすく、試しやすくなります。
+pstack には「[Build the Lever](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-build-the-lever/SKILL.md)」という原則があります。スキルを作る文脈では、エージェントには markdown だけではなく道具を渡す、という意味です。検証スキルでは、アプリの操作とデバッグをスクリプト化する、小さくてエージェント向きの CLI を作ります。何かをクリックするためだけの使い捨てスクリプトを書く代わりに CLI コマンドを実行するので、トークン消費が減り、検証スキルは再現しやすく、試しやすくなります。
 
 Electron アプリ向けにエージェントが作るかもしれない、仮想の CLI の例です。
 
@@ -111,7 +111,7 @@ node .cursor/skills/verify-atlas/control-atlas.mjs feature-flag rooms_v2 on
 
 私はこれを勧めません。一つには、マシンのディスクと資源を多く使います。リポジトリの大きさとマシンの性能次第で、worktree なら並列 10 エージェントくらいまでは行けるかもしれません。もっと良いやり方があります。
 
-Cursor の cloud agents は、Cursor のインフラ上のクラウドで動くエージェントです。本物のコンピュータがあり、依存関係を入れ、アプリを起動し、動画とスクリーンショットを撮り、本物のユーザーと同じようにアプリを操作できます。前の段階で開発体験を十分良くしていれば、cloud agents のセットアップは大きな追加作業にはなりません。クラウド環境を最初に組むとき、セットアップと動作確認を助けるエージェントが送られます。最初のビルドのあとスナップショットを取るので、その後の cloud agent 実行はすぐ始まります。
+Cursor の [cloud agents](https://cursor.com/docs/cloud-agent) は、Cursor のインフラ上のクラウドで動くエージェントです。本物のコンピュータがあり、依存関係を入れ、アプリを起動し、動画とスクリーンショットを撮り、本物のユーザーと同じようにアプリを操作できます。前の段階で開発体験を十分良くしていれば、cloud agents のセットアップは大きな追加作業にはなりません。クラウド環境を最初に組むとき、セットアップと動作確認を助けるエージェントが送られます。最初のビルドのあとスナップショットを取るので、その後の cloud agent 実行はすぐ始まります。
 
 cloud agents のセットアップに時間を使うことを強く勧めます。並列化の生産性が大きく上がります。後の投稿で、クラウドで数百のサブエージェントを並列に動かす方法を見せます。いまは環境を整え、エージェントをすべてクラウドで動かしても大丈夫だと思える状態にしてください。
 
@@ -119,7 +119,7 @@ cloud agents のセットアップに時間を使うことを強く勧めます�
 
 アプリが複雑になると、エージェントは機能を見つけ、操作するための案内がもっと必要になります。そのために私が考えたのが Feature Map です。名前のとおり、アプリにある機能、それが何をするか、ユーザー視点でそこにどう行くかの、検索しやすい地図です。
 
-架空のアプリ Atlas 向けに用意した Feature Map の例があります。検証スキルの `SKILL.md` から言及される、いくつかの markdown ファイルです。
+架空のアプリ Atlas 向けに用意した [Feature Map](https://github.com/cursor/plugins/tree/main/pstack/skills/create-verification-skill/references/feature-map-example) の例があります。検証スキルの `SKILL.md` から言及される、いくつかの markdown ファイルです。
 
 置き場所は自由です。`/create-verification-skill` では、`references/features` ディレクトリと `README.md` を自動で作ります。readme が地図そのものです。主要な機能の概要と、詳細へのリンクです。機能の例は次のような形です。
 
@@ -170,7 +170,7 @@ Feature Map は「実体化した記憶」だと考えてください。エー�
 
 pstack と一緒に使うときの、私のやり方です。
 
-まず、プロンプトを `/poteto-mode` で始めます。Cursor で pstack を使っているなら、`/poteto-mode` の補完で Enter だけではなく Opt + Enter を押せます。スキルが Custom Mode として足され、固定されるので、新しいターンごとにスキルを使うようエージェントへリマインドされます。
+まず、プロンプトを `/poteto-mode` で始めます。Cursor で pstack を使っているなら、`/poteto-mode` の補完で Enter だけではなく Opt + Enter を押せます。スキルが [Custom Mode](https://cursor.com/docs/context/rules) として足され、固定されるので、新しいターンごとにスキルを使うようエージェントへリマインドされます。
 
 Grok @Bot では、プラグインを入れたあと `/poteto-mode` と入力します。
 
@@ -179,13 +179,13 @@ Grok @Bot では、プラグインを入れたあと `/poteto-mode` と入力し
 新機能を作るときは、検証スキルを `/poteto-mode` と一緒に使い、エージェントに作業を確かめさせます。たとえば次のように頼むことがあります。
 
 ```
-/poteto-mode build <description of feature, any useful context>. use /control-app to verify your changes and show me a video and screenshots as proof
+/poteto-mode build &lt;description of feature, any useful context&gt;. use /control-app to verify your changes and show me a video and screenshots as proof
 ```
 
 `/control-app` は `/create-verification-skill` の結果です。Grok @Bot では、次のように頼むことがあります。
 
 ```
-spawn a cloud agent to use /poteto-mode to build <description of feature, any useful context>. use /control-app to verify your changes and show me a video and screenshots as proof
+spawn a cloud agent to use /poteto-mode to build &lt;description of feature, any useful context&gt;. use /control-app to verify your changes and show me a video and screenshots as proof
 ```
 
 小さな違いは、Grok @Bot ではボット自身に作業させず、cloud agent を spawn させることです。ボットを他のことに空け、コンテキストウィンドウをきれいに保つためです。その意味で、私はボットを、cloud agents を管理し監督するコーディネータだと思っています。Cloud agents なら、Cursor で使えるモデル一式を、それぞれ別マシンで使えます。ボットのコンピュータは他のことに空きます。
@@ -196,11 +196,11 @@ spawn a cloud agent to use /poteto-mode to build <description of feature, any us
 spawn a cloud agent to use /poteto-mode to improve the initial loading time of our app. first use /control-app to take a trace of the status quo, and identify opportunities for improvement. then do a targeted fix and use /control-app + a /swarm to confirm the win
 ```
 
-`/swarm` は、検証スキルと組み合わせる最良のスキルの一つです。任意の数の cloud agents を広げて検証スキルを走らせます。十分な標本数で perf の改善を確認する、アプリを fuzz して壊していないことや回帰がないことを確かめる、といったことができます。
+[`/swarm`](https://github.com/cursor/plugins/blob/main/pstack/skills/swarm/SKILL.md) は、検証スキルと組み合わせる最良のスキルの一つです。任意の数の cloud agents を広げて検証スキルを走らせます。十分な標本数で perf の改善を確認する、アプリを fuzz して壊していないことや回帰がないことを確かめる、といったことができます。
 
 ### 例: ユーザー報告を自動で再現する
 
-検証スキルに満足したら、Grok @Bot の routines や Cursor Automations に入れられます。スケジュールで走らせたり、イベントで発火させたりできます。
+検証スキルに満足したら、Grok @Bot の routines や [Cursor Automations](https://cursor.com/docs/automations) に入れられます。スケジュールで走らせたり、イベントで発火させたりできます。
 
 たとえばユーザーフィードバックを Slack に流している、あるいは社内のフィードバックチャネルがあるなら、すべての報告をボットに聞かせ、cloud agent で自動再現を試みさせられます。検証スキルと Feature Map が十分よければ、自動修正まで決めることもあるでしょう。
 
@@ -212,11 +212,7 @@ spawn a cloud agent to use /poteto-mode to improve the initial loading time of o
 
 このスキルは、この pstack ガイドでこれから扱う多くのスキルの土台であり、どれともきれいに合成されます。
 
-- pstack: https://x.ai/bot/plugin/9717366 （GitHub へのリンクもあります）
+- pstack: https://x.ai/bot/plugin/9717366 （[GitHub](https://github.com/cursor/plugins/tree/main/pstack) へのリンクもあります）
 - Dr Eggbot: https://x.ai/bot/93gOz3op1UQdBdbekQFLK
-
-高品質なボット作りを助ける私のボット、Dr Eggbot をロスターに入れることを勧めます。Dr Eggbot は pstack に同梱されます。コーディングボットに使い方を教え、同じ厳密さで非コーディングボットも作れます。
-
-Dr Eggbot にエンジニアボットを作らせ、そのボットに `/create-verification-skill` を実行させ、`/maintain-verification-skill` を毎日走らせるルーティンを組ませることもできます。
 
 読んでくれてありがとう。第2部をお待ちください。

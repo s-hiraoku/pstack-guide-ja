@@ -45,8 +45,8 @@
 <p>第一に、騒がしい会話を、構造化された問題文へ圧縮させます。第二に、誤解をすぐ捕まえられます。スレッドの赤いニシンに固着したら、コードを書き始める前にすぐ直せます。</p>
 <p>第三に、自分の前提や仮説を述べて、誤った道へ連れて行ったり、エージェントが本来達成できたことを制限したりせずに済みます。その前提が間違っているかもしれないからです。</p>
 <h2 id="メンタルモデルを組み立てる">メンタルモデルを組み立てる</h2>
-<p>自分より賢い相手と働くとき、あなたが理解できる形で言い直させることは重要です。それが <code>/teach</code> の着想です。エージェントが直観的なやり方で説明するためのスキルです。エージェントがしていることが自分に意味をなすかを確かめたいときに使います。</p>
-<p>内部では、<code>/teach</code> は <code>/how</code> と <code>/why</code> を呼び出します。</p>
+<p>自分より賢い相手と働くとき、あなたが理解できる形で言い直させることは重要です。それが <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/teach/SKILL.md">`/teach`</a> の着想です。エージェントが直観的なやり方で説明するためのスキルです。エージェントがしていることが自分に意味をなすかを確かめたいときに使います。</p>
+<p>内部では、<code>/teach</code> は <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/how/SKILL.md">`/how`</a> と <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/why/SKILL.md">`/why`</a> を呼び出します。</p>
 <p><code>/how</code> は実行時の仕組みを辿ります。<code>/how</code> を聞くと、エージェントはサブシステムの複雑さを見ます。複数ディレクトリやサービスにまたがるなら、Grok のような速くて効率的なモデルで、並列の explorer エージェントを spawn します。</p>
 <div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/how is virtualization implemented?
 </code></pre></div>
@@ -59,19 +59,19 @@
 <p>実務では、<code>/teach</code> の調査は人間だけでなくエージェントにも役立つとわかりました。最新のフロンティアモデルでも（ハーネスの質にも依りますが）、一般に、データや、仕組みのメンタルモデルを作るのに必要なコードを読まずに、自信満々に述べることが多いです。だから、何をしようとしているか、なぜかを教える行為は、エージェント自身にも役立ちます。</p>
 <h2 id="履歴から学ぶ">履歴から学ぶ</h2>
 <p>私のプロジェクトの多くは、複数の会話にまたがります。たとえば数か月前、Cursor で報告されていた仮想化の不具合と perf の問題を直していました。新しいチャットを始めるたびに、似た問題を解いていたときの豊かな文脈を、ほぼ一から作り直す必要がありました。</p>
-<p>気づいたのは、過去のトランスクリプトが豊かな文脈の金鉱だということです。pstack には <code>/recall</code> があり、チャット履歴から最近の文脈を引きます。新しいエージェントでも、良い状態に戻るための正しい文脈を持てます。</p>
+<p>気づいたのは、過去のトランスクリプトが豊かな文脈の金鉱だということです。pstack には <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/recall/SKILL.md">`/recall`</a> があり、チャット履歴から最近の文脈を引きます。新しいエージェントでも、良い状態に戻るための正しい文脈を持てます。</p>
 <div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/recall the work i did yesterday on virtualization and then read this bug report on slack
 </code></pre></div>
 <p><code>/teach</code>、<code>/recall</code>、<code>/how</code>、<code>/why</code> で、自分のコードベースのメンタルモデルを最新に保ち、覚えやすく理解しやすい形へ圧縮しています。エージェントにも役立ちます。</p>
 <h2 id="逆算して考える">逆算して考える</h2>
 <p>問題がわかったら、解をどう指定しますか。</p>
-<p>計画モードを持つハーネスの多くは、実装の詳細を過剰に指定し、それ以外を過少に指定すると私は思っています。だから pstack では、冗談めかして「計画は信じていない」と書きました。実際は計画します。ただしコードを通して計画します。</p>
+<p>計画モードを持つハーネスの多くは、実装の詳細を過剰に指定し、それ以外を過少に指定すると私は思っています。だから pstack では、冗談めかして「<a href="https://github.com/cursor/plugins/tree/main/pstack#why-are-there-no-planning-skills">計画は信じていない</a>」と書きました。実際は計画します。ただしコードを通して計画します。</p>
 <p>共有コードや、他の人が使うパッケージを作る種類の仕事では、readme driven development を強く信じています。馴染みがなければ、昔よく使われた開発の技法で、まず readme を書きます。開発者体験の帽子を被り、仮想のユーザー向けに API を先に書き、そこから実装とアーキテクチャへ逆算します。</p>
-<p>たとえば社内のデスクトップアプリ向けクライアントフレームワーク Dune を作ったとき、まずチュートリアルを書き、それでアプリを作る感覚を理解しようとしました。少なくともそうしようとしました。エージェントから良くて読めるものを出すのは本当に苦労しました。だから先に刃を研ぐ時間を取り、<code>/technical-writing</code> スキルを作りました。</p>
+<p>たとえば社内のデスクトップアプリ向けクライアントフレームワーク Dune を作ったとき、まずチュートリアルを書き、それでアプリを作る感覚を理解しようとしました。少なくともそうしようとしました。エージェントから良くて読めるものを出すのは本当に苦労しました。だから先に刃を研ぐ時間を取り、<a href="https://github.com/cursor/plugins/blob/main/pstack/skills/technical-writing/SKILL.md">`/technical-writing`</a> スキルを作りました。</p>
 <p><code>/technical-writing</code> なしの最初の readme は、目的が混ざっていて読むのが苦痛でした。チュートリアル、ハウツー、アーキテクチャの説明、API リファレンスを同じ文書にしようとし、いつもの AI のスロップと気どった散文で書かれていました。</p>
-<p><code>/technical-writing</code> は Diátaxis フレームワークを使い、文書を四つのモードに分けます。</p>
+<p><code>/technical-writing</code> は <a href="https://diataxis.fr/">Diátaxis</a> フレームワークを使い、文書を四つのモードに分けます。</p>
 <ul><li>Tutorial: やって学ぶ。新参者が一連の手順で、目に見えるものを作る授業です。</li><li>How-to guide: 経験者向けに、具体的で現実の問題を解く手順です。</li><li>Reference: 機械、API、設定フラグの、乾いて完全で権威ある技術記述です。</li><li>Explanation: 背景、設計判断、トレードオフを照らし、明らかにする高いレベルの議論です。</li></ul>
-<p><code>/unslop</code> も使うので、非常に読みやすい文書になります。</p>
+<p><a href="https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md">`/unslop`</a> も使うので、非常に読みやすい文書になります。</p>
 <p>この書き方で計画すると、エージェントが自分の作業を照合できる具体的な目標ができます。エージェントが何を作るかも、ずっと理解しやすくなります。</p>
 <p>設計の段階では、pstack の多くのスキルがここで合成されます。たとえば次です。</p>
 <div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">(1) /recall my work fixing virtualization bugs and perf issues from the past 7 days. use /how and /why to understand how our current virtualization implementation works.
@@ -87,7 +87,7 @@
 <ul><li>エージェントの最初の設計を受け入れる。</li><li>経験的な証拠なしに計画を煮込みすぎる。</li></ul>
 <p>人間がコードを書いていたころは、設計ドキュメントでよく協働していました。高いレベルのアーキテクチャ、検討した代替、トレードオフ、珍しい実装メモを話す文書です。落ち着いた設計に至るまで、何度も改稿するのが普通でした。</p>
 <p>エージェントでは設計ドキュメントの儀式は飛ばせますが、エージェントが最初に返したものを受け入れてしまう誤りをよく見ます。pstack では、「二度測って一度切る」を極限まで持っていけます。並列エージェントを使います。</p>
-<p>それをやるのが、プロトタイピングのプレイブックです。</p>
+<p>それをやるのが、<a href="https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/prototype.md">プロトタイピングのプレイブック</a>です。</p>
 <p>pstack では、プレイブックはスキルではなく、<code>/poteto-mode</code> の中の参照ファイルです。作業の種類に応じて条件付きで読み込まれます。トークン効率のためです。0.15.0 時点で 23 のプレイブックがあり、それぞれ私が作業するときの手順が入っています。</p>
 <p>スキルと違い、プレイブックは <code>/poteto-mode</code> の一部としてエージェントが自動で使います。たとえば次です。</p>
 <div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/poteto-mode prototype a few options for the new dropdown menu
@@ -102,7 +102,7 @@
 <p>プロトタイピングは、コードでやる計画です。エージェントが問題空間を探る自由を持ち、自分では思いつかないもので驚かせる余地を与えます。プロトタイプは、私の入力を待たずに、経験的な証拠で自分の問いに答えられます。</p>
 <h2 id="より大きな変更を設計する">より大きな変更を設計する</h2>
 <p>エージェントの時代のエンジニアとして、私が時間を使うべきなのはアーキテクチャ、正しいデータ構造の選択、作るシステム同士がどう協働するかです。実装の詳細はエージェントが埋めます。</p>
-<p>pstack が同梱するもう一つの有用なスキルが <code>/architect</code> です。設計を、区切られた厳密な段階にします。</p>
+<p>pstack が同梱するもう一つの有用なスキルが <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/architect/SKILL.md">`/architect`</a> です。設計を、区切られた厳密な段階にします。</p>
 <ul><li>Ground the problem。エージェントは影響するシステムに <code>/how</code> と <code>/why</code> を走らせ、既存の所有と制約の正確なメンタルモデルを作ります。</li><li>Sketch。エージェントはアーキテクチャの arena に入ります。独立した候補 runner を並列に spawn し、しばしば違うモデル家系にまたがります。各 runner は grounding の brief を受け、完全な設計パッケージを書きます。呼び出し側の usage sketch、中核の型定義、公開関数のシグネチャ、短い根拠です。ふつうは、呼び出し側をどう見せたいかから導いた型シグネチャだけをスケッチします。各 runner は interface depth を評価し、弱いモデルでの失敗モードを見、設計の赤い旗のカタログで検査しなければなりません。</li><li>Cross-judge and Synthesize。メインエージェントと違うモデルの cross-judge エージェントが、厳しいルーブリックで候補を評価します。</li><li>Implement against the sketch。エージェントはスケッチの仮本体を本物の論理に置き換えます。実装中に、想定外の引数や追加状態が必要だとわかったら、その食い違いを表に出します。</li><li>Scrap when the design is wrong。実装中にスケッチが間違っていたとわかったら、全部捨ててやり直します。</li></ul>
 <p>要点は、エージェントに自己完結した小さなループを渡すことです。違うモデル家系からの複数の競合設計を一つの最適なやり方へ合成し、厳密であり、経験的な証明でアーキテクチャが間違っていたら捨てることを恐れない。同じ回避が無関係な呼び出し側に何度も出る、型が <code>any</code> や強制キャストのような逃げ穴を必要とする、それがアーキテクチャが間違っている経験的な証明です。</p>
 <div class="code-block"><div class="code-toolbar"><span>text</span><button type="button" class="copy-button" aria-label="このコードをコピー">コピー</button></div><pre tabindex="0"><code class="language-text">/architect this new &lt;feature request&gt;
@@ -144,6 +144,7 @@
 <h2 id="計画の技術">計画の技術</h2>
 <p>Plan Mode は、エージェントが正しいことをすると自分を納得させる手段として使われがちです。実際には、抽象計画は進捗の錯覚しか与えません。長く厚い計画は、あなたとエージェントがとても生産的だったように見えます。中身はたぶん足りません。</p>
 <p>pstack は、徹底した調査、経験的な証拠、厳密な検証を組み合わせる道具を渡します。こう計画すると、エージェントとのエンジニアリングは賭けのように感じなくなります。予測でき、繰り返せます。</p>
+<ul><li>pstack: https://x.ai/bot/plugin/9717366 （<a href="https://github.com/cursor/plugins/tree/main/pstack">GitHub</a> へのリンクもあります）</li></ul>
 <p>読んでくれてありがとう。第3部をお待ちください。</p>
 </article>
 <footer>
