@@ -14,7 +14,9 @@ CSS_HREF = "guide.css"
 
 
 def slugify(text: str) -> str:
-    raw = re.sub(r"<[^>]+>", "", text)
+    raw = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    raw = re.sub(r"`([^`]+)`", r"\1", raw)
+    raw = re.sub(r"<[^>]+>", "", raw)
     slug = re.sub(r"[^\w\-]+", "-", raw, flags=re.UNICODE).strip("-").lower()
     return slug or "section"
 
@@ -27,7 +29,9 @@ def inline(text: str) -> str:
     )
     for match in pattern.finditer(text):
         if match.start() > i:
-            parts.append(html.escape(text[i : match.start()]))
+            segment = html.escape(text[i : match.start()])
+            segment = segment.replace("&amp;lt;", "&lt;").replace("&amp;gt;", "&gt;")
+            parts.append(segment)
         token = match.group(0)
         if token.startswith("`"):
             parts.append(f"<code>{html.escape(token[1:-1])}</code>")
@@ -39,7 +43,9 @@ def inline(text: str) -> str:
                 f'<a href="{html.escape(url, quote=True)}">{html.escape(label)}</a>'
             )
         i = match.end()
-    parts.append(html.escape(text[i:]))
+    trailing = html.escape(text[i:])
+    trailing = trailing.replace("&amp;lt;", "&lt;").replace("&amp;gt;", "&gt;")
+    parts.append(trailing)
     return "".join(parts)
 
 
@@ -66,6 +72,7 @@ def render_blocks(md: str) -> tuple[str, list[tuple[str, str]]]:
                 i += 1
             i += 1
             code = html.escape("\n".join(body) + ("\n" if body else ""))
+            code = code.replace("&amp;lt;", "&lt;").replace("&amp;gt;", "&gt;")
             out.append(
                 '<div class="code-block"><div class="code-toolbar">'
                 f"<span>{html.escape(lang)}</span>"

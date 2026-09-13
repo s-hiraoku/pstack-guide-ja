@@ -54,9 +54,9 @@ status_id: "2097732320606507506"
 
 ## メンタルモデルを組み立てる
 
-自分より賢い相手と働くとき、あなたが理解できる形で言い直させることは重要です。それが `/teach` の着想です。エージェントが直観的なやり方で説明するためのスキルです。エージェントがしていることが自分に意味をなすかを確かめたいときに使います。
+自分より賢い相手と働くとき、あなたが理解できる形で言い直させることは重要です。それが [`/teach`](https://github.com/cursor/plugins/blob/main/pstack/skills/teach/SKILL.md) の着想です。エージェントが直観的なやり方で説明するためのスキルです。エージェントがしていることが自分に意味をなすかを確かめたいときに使います。
 
-内部では、`/teach` は `/how` と `/why` を呼び出します。
+内部では、`/teach` は [`/how`](https://github.com/cursor/plugins/blob/main/pstack/skills/how/SKILL.md) と [`/why`](https://github.com/cursor/plugins/blob/main/pstack/skills/why/SKILL.md) を呼び出します。
 
 `/how` は実行時の仕組みを辿ります。`/how` を聞くと、エージェントはサブシステムの複雑さを見ます。複数ディレクトリやサービスにまたがるなら、Grok のような速くて効率的なモデルで、並列の explorer エージェントを spawn します。
 
@@ -73,7 +73,7 @@ status_id: "2097732320606507506"
 エージェントに何か言い直させて、理解と信頼を上げたいときは `/teach` を使います。
 
 ```
-/teach me why you implemented it this way and not <other way>. what were the tradeoffs you made and why?
+/teach me why you implemented it this way and not &lt;other way&gt;. what were the tradeoffs you made and why?
 ```
 
 実務では、`/teach` の調査は人間だけでなくエージェントにも役立つとわかりました。最新のフロンティアモデルでも（ハーネスの質にも依りますが）、一般に、データや、仕組みのメンタルモデルを作るのに必要なコードを読まずに、自信満々に述べることが多いです。だから、何をしようとしているか、なぜかを教える行為は、エージェント自身にも役立ちます。
@@ -82,7 +82,7 @@ status_id: "2097732320606507506"
 
 私のプロジェクトの多くは、複数の会話にまたがります。たとえば数か月前、Cursor で報告されていた仮想化の不具合と perf の問題を直していました。新しいチャットを始めるたびに、似た問題を解いていたときの豊かな文脈を、ほぼ一から作り直す必要がありました。
 
-気づいたのは、過去のトランスクリプトが豊かな文脈の金鉱だということです。pstack には `/recall` があり、チャット履歴から最近の文脈を引きます。新しいエージェントでも、良い状態に戻るための正しい文脈を持てます。
+気づいたのは、過去のトランスクリプトが豊かな文脈の金鉱だということです。pstack には [`/recall`](https://github.com/cursor/plugins/blob/main/pstack/skills/recall/SKILL.md) があり、チャット履歴から最近の文脈を引きます。新しいエージェントでも、良い状態に戻るための正しい文脈を持てます。
 
 ```
 /recall the work i did yesterday on virtualization and then read this bug report on slack
@@ -94,22 +94,22 @@ status_id: "2097732320606507506"
 
 問題がわかったら、解をどう指定しますか。
 
-計画モードを持つハーネスの多くは、実装の詳細を過剰に指定し、それ以外を過少に指定すると私は思っています。だから pstack では、冗談めかして「計画は信じていない」と書きました。実際は計画します。ただしコードを通して計画します。
+計画モードを持つハーネスの多くは、実装の詳細を過剰に指定し、それ以外を過少に指定すると私は思っています。だから pstack では、冗談めかして「[計画は信じていない](https://github.com/cursor/plugins/tree/main/pstack#why-are-there-no-planning-skills)」と書きました。実際は計画します。ただしコードを通して計画します。
 
 共有コードや、他の人が使うパッケージを作る種類の仕事では、readme driven development を強く信じています。馴染みがなければ、昔よく使われた開発の技法で、まず readme を書きます。開発者体験の帽子を被り、仮想のユーザー向けに API を先に書き、そこから実装とアーキテクチャへ逆算します。
 
-たとえば社内のデスクトップアプリ向けクライアントフレームワーク Dune を作ったとき、まずチュートリアルを書き、それでアプリを作る感覚を理解しようとしました。少なくともそうしようとしました。エージェントから良くて読めるものを出すのは本当に苦労しました。だから先に刃を研ぐ時間を取り、`/technical-writing` スキルを作りました。
+たとえば社内のデスクトップアプリ向けクライアントフレームワーク Dune を作ったとき、まずチュートリアルを書き、それでアプリを作る感覚を理解しようとしました。少なくともそうしようとしました。エージェントから良くて読めるものを出すのは本当に苦労しました。だから先に刃を研ぐ時間を取り、[`/technical-writing`](https://github.com/cursor/plugins/blob/main/pstack/skills/technical-writing/SKILL.md) スキルを作りました。
 
 `/technical-writing` なしの最初の readme は、目的が混ざっていて読むのが苦痛でした。チュートリアル、ハウツー、アーキテクチャの説明、API リファレンスを同じ文書にしようとし、いつもの AI のスロップと気どった散文で書かれていました。
 
-`/technical-writing` は Diátaxis フレームワークを使い、文書を四つのモードに分けます。
+`/technical-writing` は [Diátaxis](https://diataxis.fr/) フレームワークを使い、文書を四つのモードに分けます。
 
 - Tutorial: やって学ぶ。新参者が一連の手順で、目に見えるものを作る授業です。
 - How-to guide: 経験者向けに、具体的で現実の問題を解く手順です。
 - Reference: 機械、API、設定フラグの、乾いて完全で権威ある技術記述です。
 - Explanation: 背景、設計判断、トレードオフを照らし、明らかにする高いレベルの議論です。
 
-`/unslop` も使うので、非常に読みやすい文書になります。
+[`/unslop`](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md) も使うので、非常に読みやすい文書になります。
 
 この書き方で計画すると、エージェントが自分の作業を照合できる具体的な目標ができます。エージェントが何を作るかも、ずっと理解しやすくなります。
 
@@ -140,7 +140,7 @@ status_id: "2097732320606507506"
 
 エージェントでは設計ドキュメントの儀式は飛ばせますが、エージェントが最初に返したものを受け入れてしまう誤りをよく見ます。pstack では、「二度測って一度切る」を極限まで持っていけます。並列エージェントを使います。
 
-それをやるのが、プロトタイピングのプレイブックです。
+それをやるのが、[プロトタイピングのプレイブック](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/prototype.md)です。
 
 pstack では、プレイブックはスキルではなく、`/poteto-mode` の中の参照ファイルです。作業の種類に応じて条件付きで読み込まれます。トークン効率のためです。0.15.0 時点で 23 のプレイブックがあり、それぞれ私が作業するときの手順が入っています。
 
@@ -155,7 +155,7 @@ pstack では、プレイブックはスキルではなく、`/poteto-mode` の�
 プロトタイピングは、私が一番好きな pstack のプレイブックの一つです。一つの目標に何度も当たり、最良の選択肢をエージェントに考えさせます。見た目のプロトタイプだけでなく、機能や不具合修正などの違う解を試作するときにも使えます。
 
 ```
-/poteto-mode prototype a few options for <feature request>. use /control-app* and take videos/screenshots for me to review and choose from
+/poteto-mode prototype a few options for &lt;feature request&gt;. use /control-app* and take videos/screenshots for me to review and choose from
 ```
 
 注: `/control-app` は第1部で作った検証スキルです。
@@ -168,7 +168,7 @@ pstack では、プレイブックはスキルではなく、`/poteto-mode` の�
 
 エージェントの時代のエンジニアとして、私が時間を使うべきなのはアーキテクチャ、正しいデータ構造の選択、作るシステム同士がどう協働するかです。実装の詳細はエージェントが埋めます。
 
-pstack が同梱するもう一つの有用なスキルが `/architect` です。設計を、区切られた厳密な段階にします。
+pstack が同梱するもう一つの有用なスキルが [`/architect`](https://github.com/cursor/plugins/blob/main/pstack/skills/architect/SKILL.md) です。設計を、区切られた厳密な段階にします。
 
 - Ground the problem。エージェントは影響するシステムに `/how` と `/why` を走らせ、既存の所有と制約の正確なメンタルモデルを作ります。
 - Sketch。エージェントはアーキテクチャの arena に入ります。独立した候補 runner を並列に spawn し、しばしば違うモデル家系にまたがります。各 runner は grounding の brief を受け、完全な設計パッケージを書きます。呼び出し側の usage sketch、中核の型定義、公開関数のシグネチャ、短い根拠です。ふつうは、呼び出し側をどう見せたいかから導いた型シグネチャだけをスケッチします。各 runner は interface depth を評価し、弱いモデルでの失敗モードを見、設計の赤い旗のカタログで検査しなければなりません。
@@ -179,7 +179,7 @@ pstack が同梱するもう一つの有用なスキルが `/architect` です�
 要点は、エージェントに自己完結した小さなループを渡すことです。違うモデル家系からの複数の競合設計を一つの最適なやり方へ合成し、厳密であり、経験的な証明でアーキテクチャが間違っていたら捨てることを恐れない。同じ回避が無関係な呼び出し側に何度も出る、型が `any` や強制キャストのような逃げ穴を必要とする、それがアーキテクチャが間違っている経験的な証明です。
 
 ```
-/architect this new <feature request>
+/architect this new &lt;feature request&gt;
 ```
 
 大きな教訓は、`/poteto-mode` のプロトタイピングと `/architect` で、コードを使って計画するほうがはるかに効果的だということです。
@@ -252,5 +252,7 @@ pstack に計画スキルはありませんが、複数フェーズの計画プ�
 Plan Mode は、エージェントが正しいことをすると自分を納得させる手段として使われがちです。実際には、抽象計画は進捗の錯覚しか与えません。長く厚い計画は、あなたとエージェントがとても生産的だったように見えます。中身はたぶん足りません。
 
 pstack は、徹底した調査、経験的な証拠、厳密な検証を組み合わせる道具を渡します。こう計画すると、エージェントとのエンジニアリングは賭けのように感じなくなります。予測でき、繰り返せます。
+
+- pstack: https://x.ai/bot/plugin/9717366 （[GitHub](https://github.com/cursor/plugins/tree/main/pstack) へのリンクもあります）
 
 読んでくれてありがとう。第3部をお待ちください。
