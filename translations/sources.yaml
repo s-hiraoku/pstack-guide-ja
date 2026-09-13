@@ -1,0 +1,40 @@
+# Registry for unofficial Japanese translations of Lauren Tan (@poteto)
+# Complete Guide posts. Add a later part by appending a row under `parts`
+# and adding the html/md files named in `local`. Then run
+# `python3 translations/render.py translations/poteto-complete-guide/part-N.md`.
+
+series:
+  id: poteto-complete-guide
+  title: The Complete Guide to pstack
+  author: Lauren Tan
+  author_handle: poteto
+  local_dir: translations/poteto-complete-guide/
+
+parts:
+  - part: 1
+    title: The Complete Guide to pstack Pt. 1
+    title_ja: pstack完全ガイド 第1部
+    source_url: https://x.com/poteto/status/2094457600259842065
+    status_id: "2094457600259842065"
+    published_at: "2026-08-31"
+    fetched_on: "2026-09-13"
+    fetched_via:
+      - x_api_article
+      - https://threadnavigator.com/thread/2094457600259842065/
+    local:
+      html: translations/poteto-complete-guide/part-1.html
+      md: translations/poteto-complete-guide/part-1.md
+
+  - part: 2
+    title: The Complete Guide to pstack Pt. 2
+    title_ja: pstack完全ガイド 第2部
+    source_url: https://x.com/poteto/status/2097732320606507506
+    status_id: "2097732320606507506"
+    published_at: "2026-09-09"
+    fetched_on: "2026-09-13"
+    fetched_via:
+      - x_api_article
+      - https://threadnavigator.com/thread/2097732320606507506/
+    local:
+      html: translations/poteto-complete-guide/part-2.html
+      md: translations/poteto-complete-guide/part-2.md
